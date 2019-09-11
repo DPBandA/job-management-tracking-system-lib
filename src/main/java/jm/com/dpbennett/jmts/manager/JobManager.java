@@ -70,6 +70,7 @@ import jm.com.dpbennett.business.entity.management.BusinessEntityManagement;
 import jm.com.dpbennett.business.entity.utils.ReturnMessage;
 import jm.com.dpbennett.cm.manager.ClientManager;
 import jm.com.dpbennett.fm.manager.FinanceManager;
+import jm.com.dpbennett.hrm.manager.HumanResourceManager;
 import jm.com.dpbennett.jmts.JMTSApplication;
 import jm.com.dpbennett.lo.manager.LegalDocumentManager;
 import jm.com.dpbennett.pm.manager.PurchasingManager;
@@ -109,15 +110,6 @@ public class JobManager implements
     private Boolean useAccPacCustomerList;
     private Boolean showJobEntry;
     private List<Job> jobSearchResultList;
-    private ClientManager clientManager;
-    private ReportManager reportManager;
-    private JobFinanceManager jobFinanceManager;
-    private FinanceManager financeManager;
-    private PurchasingManager purchasingManager;
-    private JobSampleManager jobSampleManager;
-    private JobContractManager jobContractManager;
-    private LegalDocumentManager legalDocumentManager;
-    private SystemManager systemManager;
     private DatePeriod dateSearchPeriod;
     private String searchType;
     private String searchText;
@@ -130,7 +122,7 @@ public class JobManager implements
     public JobManager() {
         init();
     }
-    
+
     public String getApplicationHeader() {
         return "Job Management & Tracking System";
     }
@@ -325,6 +317,8 @@ public class JobManager implements
 
         getSystemManager().addSingleLoginActionListener(this);
         getSystemManager().addSingleSearchActionListener(this);
+        
+        initManagers();
     }
 
     /**
@@ -333,11 +327,8 @@ public class JobManager implements
      * @return
      */
     public LegalDocumentManager getLegalDocumentManager() {
-        if (legalDocumentManager == null) {
-            legalDocumentManager = BeanUtils.findBean("legalDocumentManager");
-        }
 
-        return legalDocumentManager;
+        return BeanUtils.findBean("legalDocumentManager");
     }
 
     /**
@@ -346,11 +337,8 @@ public class JobManager implements
      * @return
      */
     public JobContractManager getJobContractManager() {
-        if (jobContractManager == null) {
-            jobContractManager = BeanUtils.findBean("jobContractManager");
-        }
 
-        return jobContractManager;
+        return BeanUtils.findBean("jobContractManager");
     }
 
     /**
@@ -359,11 +347,8 @@ public class JobManager implements
      * @return
      */
     public JobSampleManager getJobSampleManager() {
-        if (jobSampleManager == null) {
-            jobSampleManager = BeanUtils.findBean("jobSampleManager");
-        }
 
-        return jobSampleManager;
+        return BeanUtils.findBean("jobSampleManager");
     }
 
     /**
@@ -372,31 +357,22 @@ public class JobManager implements
      * @return
      */
     public JobFinanceManager getJobFinanceManager() {
-        if (jobFinanceManager == null) {
-            jobFinanceManager = BeanUtils.findBean("jobFinanceManager");
-        }
 
-        return jobFinanceManager;
+        return BeanUtils.findBean("jobFinanceManager");
     }
 
     public PurchasingManager getPurchasingManager() {
-        if (purchasingManager == null) {
-            purchasingManager = BeanUtils.findBean("purchasingManager");
-        }
-
-        return purchasingManager;
+        return BeanUtils.findBean("purchasingManager");
     }
+
     /**
      * Get FinanceManager SessionScoped bean.
      *
      * @return
      */
     public FinanceManager getFinanceManager() {
-        if (financeManager == null) {
-            financeManager = BeanUtils.findBean("financeManager");
-        }
 
-        return financeManager;
+        return BeanUtils.findBean("financeManager");
     }
 
     /**
@@ -405,9 +381,7 @@ public class JobManager implements
      * @return
      */
     public ReportManager getReportManager() {
-        reportManager = BeanUtils.findBean("reportManager");
-
-        return reportManager;
+        return BeanUtils.findBean("reportManager");
     }
 
     /**
@@ -417,11 +391,13 @@ public class JobManager implements
      */
     public ClientManager getClientManager() {
 
-        clientManager = BeanUtils.findBean("clientManager");
-
-        return clientManager;
+        return BeanUtils.findBean("clientManager");
     }
-
+    
+    public HumanResourceManager getHumanResourceManager() {
+        return BeanUtils.findBean("humanResourceManager");
+    }
+    
     /**
      * Gets the date search period for jobs.
      *
@@ -535,24 +511,26 @@ public class JobManager implements
 
     }
 
-    private void resetManagers() {
+    private void initManagers() {
         try {
 
-            getClientManager().reset();
-            getJobContractManager().reset();
-            getJobFinanceManager().reset();
-            getFinanceManager().reset();
-            //getPurchasingManager().reset();
-            getJobSampleManager().reset();
-            getReportManager().reset();
+            getClientManager();
+            getJobContractManager();
+            getJobFinanceManager();
+            getFinanceManager();
+            getPurchasingManager();
+            getJobSampleManager();
+            getReportManager();
+            getHumanResourceManager();
+            getLegalDocumentManager();
 
         } catch (Exception e) {
-            System.out.println("An ");
+            System.out.println("An error occured while resetting managers: " + e);
         }
     }
 
     public void reset() {
-        getSystemManager().getAuthentication().reset();
+        //getSystemManager().getAuthentication().reset();
         jobSearchResultList = new ArrayList<>();
     }
 
@@ -2205,9 +2183,8 @@ public class JobManager implements
      * @return
      */
     public SystemManager getSystemManager() {
-        systemManager = BeanUtils.findBean("systemManager");
-
-        return systemManager;
+        
+        return BeanUtils.findBean("systemManager");
     }
 
     private void initMainTabView() {
@@ -2219,7 +2196,7 @@ public class JobManager implements
     }
 
     private void initDashboard() {
-        
+
         if (getUser().getModules().getJobManagementAndTrackingModule()) {
             getSystemManager().getDashboard().openTab("Job Management");
         }
