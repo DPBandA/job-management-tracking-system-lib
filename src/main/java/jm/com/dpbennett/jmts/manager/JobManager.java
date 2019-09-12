@@ -2202,11 +2202,11 @@ public class JobManager implements
         }
 
         // Set the first tab as the selected tab
-        if (!getSystemManager().getDashboard().getTabs().isEmpty()) {
-            getSystemManager().getDashboard().
-                    setSelectedTabId(getSystemManager().getDashboard().
-                            getTabs().get(0).getId());
-        }
+//        if (!getSystemManager().getDashboard().getTabs().isEmpty()) {
+//            getSystemManager().getDashboard().
+//                    setSelectedTabId(getSystemManager().getDashboard().
+//                            getTabs().get(0).getId());
+//        }
     }
 
     @Override
