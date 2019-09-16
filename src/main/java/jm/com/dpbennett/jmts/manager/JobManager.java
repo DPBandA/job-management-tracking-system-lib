@@ -80,7 +80,6 @@ import jm.com.dpbennett.sm.manager.SystemManager.LoginActionListener;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.UnselectEvent;
-import jm.com.dpbennett.sm.manager.SystemManager.SearchActionListener;
 import jm.com.dpbennett.sm.util.BeanUtils;
 import jm.com.dpbennett.sm.util.Dashboard;
 import jm.com.dpbennett.sm.util.DateUtils;
@@ -95,8 +94,7 @@ import jm.com.dpbennett.sm.util.Utils;
  * @author Desmond Bennett
  */
 public class JobManager implements
-        Serializable, BusinessEntityManagement,
-        SearchActionListener, LoginActionListener {
+        Serializable, BusinessEntityManagement, LoginActionListener {
 
     private JMTSApplication application;
     @PersistenceUnit(unitName = "JMTSPU")
@@ -316,8 +314,7 @@ public class JobManager implements
         dateSearchPeriod.initDatePeriod();
 
         getSystemManager().addSingleLoginActionListener(this);
-        getSystemManager().addSingleSearchActionListener(this);
-        
+
         initManagers();
     }
 
@@ -393,11 +390,11 @@ public class JobManager implements
 
         return BeanUtils.findBean("clientManager");
     }
-    
+
     public HumanResourceManager getHumanResourceManager() {
         return BeanUtils.findBean("humanResourceManager");
     }
-    
+
     /**
      * Gets the date search period for jobs.
      *
@@ -1629,15 +1626,14 @@ public class JobManager implements
                 includeSampleSearch);
     }
 
-    @Override
     public void doDefaultSearch() {
 
         switch (getDashboard().getSelectedTabId()) {
             case "Procurement":
-                //getPurchasingManager().doDefaultSearch();
+                getPurchasingManager().doDefaultSearch();
                 break;
             case "Financial Administration":
-                getFinanceManager().doSearch();  // tk to be replaced with doDefaultSearch()
+                getFinanceManager().doSearch();
                 break;
             case "Document Management":
                 getLegalDocumentManager().doSearch();
@@ -1653,20 +1649,22 @@ public class JobManager implements
 
     public void doSearch() {
 
-        switch (searchType) {
-            case "Purchase requisitions":
-                doPurchaseReqSearch();
-                break;
-            case "Suppliers":
-//                getPurchasingManager().doSupplierSearch(searchText);
-//                getPurchasingManager().openSuppliersTab();
-                break;
-            default:
-                doJobSearch();
-                openJobBrowser();
-                break;
-        }
+        doJobSearch();
+        openJobBrowser();
 
+//        switch (searchType) {
+//            case "Purchase requisitions":
+//                doPurchaseReqSearch();
+//                break;
+//            case "Suppliers":
+////                getPurchasingManager().doSupplierSearch(searchText);
+////                getPurchasingManager().openSuppliersTab();
+//                break;
+//            default:
+//                doJobSearch();
+//                openJobBrowser();
+//                break;
+//        }
     }
 
     public void doPurchaseReqSearch() {
@@ -2183,7 +2181,7 @@ public class JobManager implements
      * @return
      */
     public SystemManager getSystemManager() {
-        
+
         return BeanUtils.findBean("systemManager");
     }
 
