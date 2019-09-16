@@ -688,13 +688,13 @@ public class JobManager implements
         return longProcessProgress;
     }
 
-    public void onLongProcessComplete() {
-        longProcessProgress = 0;
-    }
+//    public void onLongProcessComplete() {
+//        longProcessProgress = 0;
+//    }
 
-    public void setLongProcessProgress(Integer longProcessProgress) {
-        this.longProcessProgress = longProcessProgress;
-    }
+//    public void setLongProcessProgress(Integer longProcessProgress) {
+//        this.longProcessProgress = longProcessProgress;
+//    }
 
     /**
      * For future implementation if necessary
@@ -733,11 +733,11 @@ public class JobManager implements
 
             serviceContractStreamContent = getJobContractManager().getServiceContractStreamContent();
 
-            setLongProcessProgress(100);
+//            setLongProcessProgress(100);
 
         } catch (Exception e) {
             System.out.println(e);
-            setLongProcessProgress(0);
+//            setLongProcessProgress(0);
         }
 
         return serviceContractStreamContent;
