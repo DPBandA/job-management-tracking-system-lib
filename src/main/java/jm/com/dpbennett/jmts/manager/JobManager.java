@@ -75,6 +75,7 @@ import jm.com.dpbennett.jmts.JMTSApplication;
 import jm.com.dpbennett.lo.manager.LegalDocumentManager;
 import jm.com.dpbennett.pm.manager.PurchasingManager;
 import jm.com.dpbennett.rm.manager.ReportManager;
+import jm.com.dpbennett.sm.Authentication.AuthenticationListener;
 import jm.com.dpbennett.sm.manager.SystemManager;
 import jm.com.dpbennett.sm.manager.SystemManager.LoginActionListener;
 import org.primefaces.PrimeFaces;
@@ -691,11 +692,9 @@ public class JobManager implements
 //    public void onLongProcessComplete() {
 //        longProcessProgress = 0;
 //    }
-
 //    public void setLongProcessProgress(Integer longProcessProgress) {
 //        this.longProcessProgress = longProcessProgress;
 //    }
-
     /**
      * For future implementation if necessary
      *
@@ -734,7 +733,6 @@ public class JobManager implements
             serviceContractStreamContent = getJobContractManager().getServiceContractStreamContent();
 
 //            setLongProcessProgress(100);
-
         } catch (Exception e) {
             System.out.println(e);
 //            setLongProcessProgress(0);
@@ -2198,13 +2196,6 @@ public class JobManager implements
         if (getUser().getModules().getJobManagementAndTrackingModule()) {
             getSystemManager().getDashboard().openTab("Job Management");
         }
-
-        // Set the first tab as the selected tab
-//        if (!getSystemManager().getDashboard().getTabs().isEmpty()) {
-//            getSystemManager().getDashboard().
-//                    setSelectedTabId(getSystemManager().getDashboard().
-//                            getTabs().get(0).getId());
-//        }
     }
 
     @Override
@@ -2212,4 +2203,5 @@ public class JobManager implements
         initDashboard();
         initMainTabView();
     }
+
 }

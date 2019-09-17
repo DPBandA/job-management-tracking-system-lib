@@ -161,13 +161,13 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
         return longProcessProgress;
     }
 
-    public void onLongProcessComplete() {
-        longProcessProgress = 0;
-    }
-
-    public void setLongProcessProgress(Integer longProcessProgress) {
-        this.longProcessProgress = longProcessProgress;
-    }
+//    public void onLongProcessComplete() {
+//        longProcessProgress = 0;
+//    }
+//
+//    public void setLongProcessProgress(Integer longProcessProgress) {
+//        this.longProcessProgress = longProcessProgress;
+//    }
 
     public StreamedContent getServiceContractFile() {
         StreamedContent serviceContractStreamContent = null;
@@ -176,10 +176,10 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
 
             serviceContractStreamContent = getServiceContractStreamContent();
 
-            setLongProcessProgress(100);
+            //setLongProcessProgress(100);
         } catch (Exception e) {
             System.out.println(e);
-            setLongProcessProgress(100);
+            //setLongProcessProgress(100);
         }
 
         return serviceContractStreamContent;
