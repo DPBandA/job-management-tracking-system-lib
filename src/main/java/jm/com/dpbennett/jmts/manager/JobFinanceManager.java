@@ -1945,6 +1945,12 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         return !(getCurrentJob().getJobCostingAndPayment().getCostingApproved()
                 && getCurrentJob().getJobCostingAndPayment().getCostingCompleted());
     }
+    
+    public Boolean getDisableJobCostingEdit() {
+         return getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Completed")
+                 || getCurrentJob().getJobCostingAndPayment().getInvoiced()
+                 || getCurrentJob().getJobCostingAndPayment().getCostingApproved();
+    }
 
     /**
      * Prepares to invoice a job costing.
