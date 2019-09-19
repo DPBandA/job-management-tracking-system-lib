@@ -331,7 +331,7 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
 
     public void openJobSampleDeleteConfirmDialog(ActionEvent event) {
 
-        PrimeFacesUtils.openDialog(null, "/job/sample/jobSampleDeleteConfirmDialog", true, true, true, 110, 375);
+        PrimeFacesUtils.openDialog(null, "/job/sample/jobSampleDeleteConfirmDialog", true, true, true, 125, 375);
     }
 
     public void doCopyJobSample() {
