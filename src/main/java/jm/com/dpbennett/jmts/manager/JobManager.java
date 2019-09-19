@@ -1628,7 +1628,7 @@ public class JobManager implements
 
         switch (getDashboard().getSelectedTabId()) {
             case "Procurement":
-                getPurchasingManager().doDefaultSearch();
+                getPurchasingManager().doSearch();
                 break;
             case "Financial Administration":
                 getFinanceManager().doSearch();
