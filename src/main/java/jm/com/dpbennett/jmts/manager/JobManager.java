@@ -75,7 +75,6 @@ import jm.com.dpbennett.jmts.JMTSApplication;
 import jm.com.dpbennett.lo.manager.LegalDocumentManager;
 import jm.com.dpbennett.pm.manager.PurchasingManager;
 import jm.com.dpbennett.rm.manager.ReportManager;
-import jm.com.dpbennett.sm.Authentication.AuthenticationListener;
 import jm.com.dpbennett.sm.manager.SystemManager;
 import jm.com.dpbennett.sm.manager.SystemManager.LoginActionListener;
 import org.primefaces.PrimeFaces;
