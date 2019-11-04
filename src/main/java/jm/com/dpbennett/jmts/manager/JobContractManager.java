@@ -19,9 +19,12 @@ Email: info@dpbennett.com.jm
  */
 package jm.com.dpbennett.jmts.manager;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,9 +136,8 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
             em = getEntityManager1();
 
             String filePath = (String) SystemOption.getOptionValueObject(em, "serviceContract");
-            FileInputStream stream = createServiceContractExcelFileInputStream(em, getUser(), getCurrentJob().getId(), filePath);
+            ByteArrayInputStream stream = createServiceContractExcelFileInputStream(em, getUser(), getCurrentJob().getId(), filePath);
 
-            // tk remove?
             DefaultStreamedContent dsc = new DefaultStreamedContent(stream, "application/xls", "servicecontract.xls");
 
             return dsc;
@@ -801,7 +803,7 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
         return font;
     }
 
-    public FileInputStream createServiceContractExcelFileInputStream(
+    public  ByteArrayInputStream createServiceContractExcelFileInputStream(
             EntityManager em,
             JobManagerUser user,
             Long jobId,
@@ -809,7 +811,6 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
         try {
 
             Job job = Job.findJobById(em, jobId);
-            //job.getJobCostingAndPayment().calculateAmountDue();
 
             Client client = job.getClient();
 
@@ -832,8 +833,8 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
             // Cell style
             HSSFCellStyle dataCellStyle;
 
-            // create temp file for output
-            FileOutputStream out = new FileOutputStream("ServiceContract-" + user.getId() + ".xls");
+            // Create temp file for output
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
 
             // get service contract sheet
             HSSFSheet serviceContractSheet = wb.getSheet("ServiceContract");
@@ -1421,12 +1422,10 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
                     details,
                     "java.lang.String", dataCellStyle);
 
-            // write and save file for later use
             wb.write(out);
-            out.close();
 
-            return new FileInputStream("ServiceContract-" + user.getId() + ".xls");
-        } catch (Exception e) {
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (IOException e) {
             System.out.println(e);
         }
 
