@@ -36,7 +36,7 @@ import jm.com.dpbennett.business.entity.Address;
 import jm.com.dpbennett.business.entity.Client;
 import jm.com.dpbennett.business.entity.Contact;
 import jm.com.dpbennett.business.entity.Department;
-import jm.com.dpbennett.business.entity.Job;
+import jm.com.dpbennett.business.entity.jmt.Job;
 import jm.com.dpbennett.business.entity.JobManagerUser;
 import jm.com.dpbennett.business.entity.JobSample;
 import jm.com.dpbennett.business.entity.Service;

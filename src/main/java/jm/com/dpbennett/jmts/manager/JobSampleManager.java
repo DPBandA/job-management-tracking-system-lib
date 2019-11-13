@@ -32,7 +32,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import jm.com.dpbennett.business.entity.Department;
-import jm.com.dpbennett.business.entity.Job;
+import jm.com.dpbennett.business.entity.jmt.Job;
 import jm.com.dpbennett.business.entity.JobManagerUser;
 import jm.com.dpbennett.business.entity.JobSample;
 import jm.com.dpbennett.business.entity.SystemOption;

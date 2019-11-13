@@ -51,7 +51,7 @@ import jm.com.dpbennett.business.entity.Department;
 import jm.com.dpbennett.business.entity.DepartmentUnit;
 import jm.com.dpbennett.business.entity.Discount;
 import jm.com.dpbennett.business.entity.Employee;
-import jm.com.dpbennett.business.entity.Job;
+import jm.com.dpbennett.business.entity.jmt.Job;
 import jm.com.dpbennett.business.entity.JobCosting;
 import jm.com.dpbennett.business.entity.JobCostingAndPayment;
 import jm.com.dpbennett.business.entity.JobManagerUser;

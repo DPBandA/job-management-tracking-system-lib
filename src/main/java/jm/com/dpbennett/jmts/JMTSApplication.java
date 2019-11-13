@@ -31,7 +31,7 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
-import jm.com.dpbennett.business.entity.Job;
+import jm.com.dpbennett.business.entity.jmt.Job;
 
 /**
  *

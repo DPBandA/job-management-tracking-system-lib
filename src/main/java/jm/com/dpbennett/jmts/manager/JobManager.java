@@ -53,7 +53,7 @@ import jm.com.dpbennett.business.entity.Contact;
 import jm.com.dpbennett.business.entity.DatePeriod;
 import jm.com.dpbennett.business.entity.Department;
 import jm.com.dpbennett.business.entity.Employee;
-import jm.com.dpbennett.business.entity.Job;
+import jm.com.dpbennett.business.entity.jmt.Job;
 import jm.com.dpbennett.business.entity.JobCategory;
 import jm.com.dpbennett.business.entity.JobCostingAndPayment;
 import jm.com.dpbennett.business.entity.JobManagerUser;
