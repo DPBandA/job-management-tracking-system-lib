@@ -23,13 +23,11 @@ package jm.com.dpbennett.jmts.converter;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import jm.com.dpbennett.business.entity.jmt.Job;
-
-
+import jm.com.dpbennett.business.entity.jmts.Job;
 
 /**
  *
- * @author Desmond
+ * @author Desmond Bennett
  */
 public class JobConverter implements Converter {
 

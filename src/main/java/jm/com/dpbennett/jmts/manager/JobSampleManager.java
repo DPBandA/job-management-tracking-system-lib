@@ -19,7 +19,6 @@ Email: info@dpbennett.com.jm
  */
 package jm.com.dpbennett.jmts.manager;
 
-import jm.com.dpbennett.jmts.manager.JobManager;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,13 +30,13 @@ import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
-import jm.com.dpbennett.business.entity.Department;
-import jm.com.dpbennett.business.entity.jmt.Job;
-import jm.com.dpbennett.business.entity.JobManagerUser;
-import jm.com.dpbennett.business.entity.JobSample;
-import jm.com.dpbennett.business.entity.SystemOption;
-import jm.com.dpbennett.business.entity.management.BusinessEntityManagement;
-import jm.com.dpbennett.business.entity.utils.BusinessEntityUtils;
+import jm.com.dpbennett.business.entity.hrm.Department;
+import jm.com.dpbennett.business.entity.jmts.JobManagerUser;
+import jm.com.dpbennett.business.entity.jmts.JobSample;
+import jm.com.dpbennett.business.entity.sm.SystemOption;
+import jm.com.dpbennett.business.entity.jmts.Job;
+import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
+import jm.com.dpbennett.business.entity.util.BusinessEntityUtils;
 import jm.com.dpbennett.sm.util.BeanUtils;
 import jm.com.dpbennett.sm.util.PrimeFacesUtils;
 import org.primefaces.PrimeFaces;
