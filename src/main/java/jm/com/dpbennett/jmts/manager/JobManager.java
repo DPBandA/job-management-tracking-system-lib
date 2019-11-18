@@ -46,12 +46,12 @@ import javax.persistence.PersistenceUnit;
 import jm.com.dpbennett.business.entity.fm.Classification;
 import jm.com.dpbennett.business.entity.cm.Client;
 import jm.com.dpbennett.business.entity.hrm.Contact;
-import jm.com.dpbennett.business.entity.DatePeriod;
+import jm.com.dpbennett.business.entity.rm.DatePeriod;
 import jm.com.dpbennett.business.entity.hrm.Department;
 import jm.com.dpbennett.business.entity.hrm.Employee;
 import jm.com.dpbennett.business.entity.fm.JobCategory;
 import jm.com.dpbennett.business.entity.fm.JobCostingAndPayment;
-import jm.com.dpbennett.business.entity.jmts.JobManagerUser;
+import jm.com.dpbennett.business.entity.hrm.User;
 import jm.com.dpbennett.business.entity.fm.JobSubCategory;
 import jm.com.dpbennett.business.entity.sm.Preference;
 import jm.com.dpbennett.business.entity.fm.Sector;
@@ -543,7 +543,7 @@ public class JobManager implements
         return EMF1.createEntityManager();
     }
 
-    public JobManagerUser getUser() {
+    public User getUser() {
         return getSystemManager().getAuthentication().getUser();
     }
 
@@ -553,7 +553,7 @@ public class JobManager implements
      * @param em
      * @return
      */
-    public JobManagerUser getUser(EntityManager em) {
+    public User getUser(EntityManager em) {
         return getSystemManager().getAuthentication().getUser(em);
     }
 
@@ -1894,20 +1894,18 @@ public class JobManager implements
 
     public void createNewJobClient() {
         getClientManager().createNewClient(true);
-        getClientManager().setIsClientNameAndIdEditable(getUser().getPrivilege().getCanAddClient());
 
         PrimeFacesUtils.openDialog(null, "/client/clientDialog", true, true, true, 450, 700);
     }
 
     public void editJobClient() {
         getClientManager().setSelectedClient(getCurrentJob().getClient());
-        getClientManager().setIsClientNameAndIdEditable(getUser().getPrivilege().getCanAddClient());
 
         PrimeFacesUtils.openDialog(null, "/client/clientDialog", true, true, true, 450, 700);
     }
 
     public ServiceRequest createNewServiceRequest(EntityManager em,
-            JobManagerUser user,
+            User user,
             Boolean autoGenerateServiceRequestNumber) {
 
         ServiceRequest sr = new ServiceRequest();
@@ -1930,8 +1928,8 @@ public class JobManager implements
         return sr;
     }
 
-    public JobManagerUser createNewUser(EntityManager em) {
-        JobManagerUser jmuser = new JobManagerUser();
+    public User createNewUser(EntityManager em) {
+        User jmuser = new User();
 
         jmuser.setEmployee(Employee.findDefaultEmployee(em, "--", "--", true));
 
@@ -1987,7 +1985,7 @@ public class JobManager implements
 
     public void postJobManagerMailToUser(
             Session mailSession,
-            JobManagerUser user,
+            User user,
             String subject,
             String message) throws Exception {
 
@@ -2162,9 +2160,7 @@ public class JobManager implements
     }
 
     public void openClientsTab() {
-        // tk remove this and do as is done for supplier
-        getClientManager().setIsClientNameAndIdEditable(getUser().getPrivilege().getCanAddClient());
-
+        
         getSystemManager().getMainTabView().openTab("Clients");
     }
 

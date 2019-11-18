@@ -31,7 +31,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import jm.com.dpbennett.business.entity.hrm.Department;
-import jm.com.dpbennett.business.entity.jmts.JobManagerUser;
+import jm.com.dpbennett.business.entity.hrm.User;
 import jm.com.dpbennett.business.entity.jmts.JobSample;
 import jm.com.dpbennett.business.entity.sm.SystemOption;
 import jm.com.dpbennett.business.entity.jmts.Job;
@@ -145,7 +145,7 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
         }
     }
 
-    public JobManagerUser getUser() {
+    public User getUser() {
         return getJobManager().getUser();
     }
 

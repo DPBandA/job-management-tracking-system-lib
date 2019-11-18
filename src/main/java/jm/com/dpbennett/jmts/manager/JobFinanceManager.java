@@ -49,7 +49,7 @@ import jm.com.dpbennett.business.entity.fm.Discount;
 import jm.com.dpbennett.business.entity.hrm.Employee;
 import jm.com.dpbennett.business.entity.fm.JobCosting;
 import jm.com.dpbennett.business.entity.fm.JobCostingAndPayment;
-import jm.com.dpbennett.business.entity.jmts.JobManagerUser;
+import jm.com.dpbennett.business.entity.hrm.User;
 import jm.com.dpbennett.business.entity.hrm.Laboratory;
 import jm.com.dpbennett.business.entity.sm.Preference;
 import jm.com.dpbennett.business.entity.fm.Service;
@@ -1362,7 +1362,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
      * Gets the logged on user field.
      * @return 
      */
-    public JobManagerUser getUser() {
+    public User getUser() {
         return getJobManager().getUser();
     }
 
@@ -3574,7 +3574,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             String listAsString = (String) SystemOption.getOptionValueObject(em, "domainNames");
             String domainNames[] = listAsString.split(";");
 
-            JobManagerUser user1 = JobManagerUser.findActiveJobManagerUserByEmployeeId(em, employee.getId());
+            User user1 = User.findActiveJobManagerUserByEmployeeId(em, employee.getId());
 
             // Build email address
             if (user1 != null) {

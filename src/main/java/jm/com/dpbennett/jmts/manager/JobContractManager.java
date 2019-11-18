@@ -34,7 +34,7 @@ import javax.persistence.PersistenceUnit;
 import jm.com.dpbennett.business.entity.cm.Client;
 import jm.com.dpbennett.business.entity.hrm.Contact;
 import jm.com.dpbennett.business.entity.hrm.Department;
-import jm.com.dpbennett.business.entity.jmts.JobManagerUser;
+import jm.com.dpbennett.business.entity.hrm.User;
 import jm.com.dpbennett.business.entity.jmts.JobSample;
 import jm.com.dpbennett.business.entity.fm.Service;
 import jm.com.dpbennett.business.entity.sm.SystemOption;
@@ -119,7 +119,7 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
         init();
     }
 
-    public JobManagerUser getUser() {
+    public User getUser() {
         return getJobManager().getUser();
     }
 
@@ -754,7 +754,7 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
      * @param job
      * @return
      */
-    // tk del. Move to JobManagerUser and make static method
+    // tk del. Move to User and make static method
     public Boolean isUserDepartmentSupervisor(Job job) {
         EntityManager em = getEntityManager1();
 
@@ -804,7 +804,7 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
 
     public  ByteArrayInputStream createServiceContractExcelFileInputStream(
             EntityManager em,
-            JobManagerUser user,
+            User user,
             Long jobId,
             String filePath) {
         try {
