@@ -304,18 +304,9 @@ public class JobManager implements
      *
      */
     private void init() {
-        showJobEntry = false;
-        longProcessProgress = 0;
-        useAccPacCustomerList = false;
-        jobSearchResultList = new ArrayList<>();
-        searchType = "";
-        dateSearchPeriod = new DatePeriod("This month", "month",
-                "dateAndTimeEntered", null, null, null, false, false, false);
-        dateSearchPeriod.initDatePeriod();
+        reset();
 
         getSystemManager().addSingleAuthenticationListener(this);
-
-        initManagers();
     }
 
     /**
@@ -527,7 +518,16 @@ public class JobManager implements
     }
 
     public void reset() {
-        init(); // tk is this too much?
+        showJobEntry = false;
+        longProcessProgress = 0;
+        useAccPacCustomerList = false;
+        jobSearchResultList = new ArrayList<>();
+        searchType = "";
+        dateSearchPeriod = new DatePeriod("This month", "month",
+                "dateAndTimeEntered", null, null, null, false, false, false);
+        dateSearchPeriod.initDatePeriod();
+        
+        initManagers();
     }
 
     public Boolean getCanApplyTax() {
@@ -2200,16 +2200,7 @@ public class JobManager implements
 
     @Override
     public void completeLogout() {
-        showJobEntry = false;
-        longProcessProgress = 0;
-        useAccPacCustomerList = false;
-        jobSearchResultList = new ArrayList<>();
-        searchType = "";
-        dateSearchPeriod = new DatePeriod("This month", "month",
-                "dateAndTimeEntered", null, null, null, false, false, false);
-        dateSearchPeriod.initDatePeriod();
-
-        initManagers();
+       reset();
     }
 
 }
