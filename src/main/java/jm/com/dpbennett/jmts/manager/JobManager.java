@@ -75,8 +75,8 @@ import jm.com.dpbennett.jmts.JMTSApplication;
 import jm.com.dpbennett.lo.manager.LegalDocumentManager;
 import jm.com.dpbennett.pm.manager.PurchasingManager;
 import jm.com.dpbennett.rm.manager.ReportManager;
+import jm.com.dpbennett.sm.Authentication.AuthenticationListener;
 import jm.com.dpbennett.sm.manager.SystemManager;
-import jm.com.dpbennett.sm.manager.SystemManager.LoginActionListener;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.UnselectEvent;
@@ -94,7 +94,7 @@ import jm.com.dpbennett.sm.util.Utils;
  * @author Desmond Bennett
  */
 public class JobManager implements
-        Serializable, BusinessEntityManagement, LoginActionListener {
+        Serializable, BusinessEntityManagement, AuthenticationListener {
 
     private JMTSApplication application;
     @PersistenceUnit(unitName = "JMTSPU")
@@ -313,7 +313,7 @@ public class JobManager implements
                 "dateAndTimeEntered", null, null, null, false, false, false);
         dateSearchPeriod.initDatePeriod();
 
-        getSystemManager().addSingleLoginActionListener(this);
+        getSystemManager().addSingleAuthenticationListener(this);
 
         initManagers();
     }
@@ -2194,9 +2194,14 @@ public class JobManager implements
     }
 
     @Override
-    public void doLogin() {
+    public void completeLogin() {
         initDashboard();
         initMainTabView();
+    }
+
+    @Override
+    public void completeLogout() {
+        System.out.println("Complete logout...");
     }
 
 }
