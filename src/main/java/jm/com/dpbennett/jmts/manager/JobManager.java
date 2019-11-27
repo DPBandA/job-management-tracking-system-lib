@@ -527,8 +527,7 @@ public class JobManager implements
     }
 
     public void reset() {
-        //getSystemManager().getAuthentication().reset();
-        jobSearchResultList = new ArrayList<>();
+        init(); // tk is this too much?
     }
 
     public Boolean getCanApplyTax() {
@@ -2160,7 +2159,7 @@ public class JobManager implements
     }
 
     public void openClientsTab() {
-        
+
         getSystemManager().getMainTabView().openTab("Clients");
     }
 
@@ -2201,7 +2200,16 @@ public class JobManager implements
 
     @Override
     public void completeLogout() {
-        System.out.println("Complete logout...");
+        showJobEntry = false;
+        longProcessProgress = 0;
+        useAccPacCustomerList = false;
+        jobSearchResultList = new ArrayList<>();
+        searchType = "";
+        dateSearchPeriod = new DatePeriod("This month", "month",
+                "dateAndTimeEntered", null, null, null, false, false, false);
+        dateSearchPeriod.initDatePeriod();
+
+        initManagers();
     }
 
 }
