@@ -3456,7 +3456,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     public void openCashPaymentDeleteConfirmDialog(ActionEvent event) {
 
-        PrimeFacesUtils.openDialog(null, "/job/finance/cashPaymentDeleteConfirmDialog", true, true, true, 110, 375);
+        PrimeFacesUtils.openDialog(null, "/job/finance/cashPaymentDeleteConfirmDialog", true, true, true, 135, 375);
     }
 
     public void closeJCashPaymentDeleteConfirmDialog() {
