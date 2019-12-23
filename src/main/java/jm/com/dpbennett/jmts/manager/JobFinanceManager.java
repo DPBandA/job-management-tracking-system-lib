@@ -157,7 +157,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
             for (Job job : getJobManager().getSelectedJobs()) {
                 if (!job.getJobCostingAndPayment().getCostingApproved()) {
-                    if (canChangeJobCostingApprovalStatus(job)) {
+                    if (canChangeJobCostingApprovalStatus(job, true)) {
                         numCostingsCApproved++;
 
                         job.getJobCostingAndPayment().setCostingApproved(true);
@@ -527,22 +527,22 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         return getJobManager().getMainTabView();
     }
-   
-    
+
     /**
      * Get all cost components without heading.
+     *
      * @param jobCostingAndPayment
-     * @return 
+     * @return
      */
     public List<CostComponent> getCostComponentsWithoutHeadings(JobCostingAndPayment jobCostingAndPayment) {
         List<CostComponent> costComponents = new ArrayList<>();
-        
+
         for (CostComponent costComponent : jobCostingAndPayment.getAllSortedCostComponents()) {
             if (!costComponent.getIsHeading()) {
                 costComponents.add(costComponent);
             }
         }
-        
+
         return costComponents;
     }
 
@@ -1030,12 +1030,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Get the accounting codes associated with a job.
+     *
      * @param job
-     * @return 
+     * @return
      */
     public List<String> getAccountingCodes(Job job) {
         List<String> codes = new ArrayList<>();
-        
+
         prepareToInvoiceJobCosting(job);
 
         codes.add(getRevenueCodeAbbreviation(job));
@@ -1213,7 +1214,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the enableOnlyPaymentEditing field. Sets it to false if it is null.
-     * @return 
+     *
+     * @return
      */
     public Boolean getEnableOnlyPaymentEditing() {
         if (enableOnlyPaymentEditing == null) {
@@ -1223,8 +1225,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * Sets the enableOnlyPaymentEditing field. 
-     * @param enableOnlyPaymentEditing 
+     * Sets the enableOnlyPaymentEditing field.
+     *
+     * @param enableOnlyPaymentEditing
      */
     public void setEnableOnlyPaymentEditing(Boolean enableOnlyPaymentEditing) {
         this.enableOnlyPaymentEditing = enableOnlyPaymentEditing;
@@ -1232,7 +1235,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the dialogRenderCancelButton field.
-     * @return 
+     *
+     * @return
      */
     public Boolean getDialogRenderCancelButton() {
         return dialogRenderCancelButton;
@@ -1240,7 +1244,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the dialogRenderCancelButton field.
-     * @param dialogRenderCancelButton 
+     *
+     * @param dialogRenderCancelButton
      */
     public void setDialogRenderCancelButton(Boolean dialogRenderCancelButton) {
         this.dialogRenderCancelButton = dialogRenderCancelButton;
@@ -1248,7 +1253,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the dialogActionHandler field.
-     * @param dialogActionHandler 
+     *
+     * @param dialogActionHandler
      */
     public void setDialogActionHandler(DialogActionHandler dialogActionHandler) {
         this.dialogActionHandler = dialogActionHandler;
@@ -1256,7 +1262,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the dialogRenderOkButton field.
-     * @return 
+     *
+     * @return
      */
     public Boolean getDialogRenderOkButton() {
         return dialogRenderOkButton;
@@ -1264,7 +1271,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the dialogRenderOkButton field.
-     * @param dialogRenderOkButton 
+     *
+     * @param dialogRenderOkButton
      */
     public void setDialogRenderOkButton(Boolean dialogRenderOkButton) {
         this.dialogRenderOkButton = dialogRenderOkButton;
@@ -1272,7 +1280,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the dialogRenderYesButton field.
-     * @return 
+     *
+     * @return
      */
     public Boolean getDialogRenderYesButton() {
         return dialogRenderYesButton;
@@ -1280,7 +1289,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the dialogRenderYesButton field.
-     * @param dialogRenderYesButton 
+     *
+     * @param dialogRenderYesButton
      */
     public void setDialogRenderYesButton(Boolean dialogRenderYesButton) {
         this.dialogRenderYesButton = dialogRenderYesButton;
@@ -1288,15 +1298,17 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the dialogRenderNoButton field.
-     * @return 
-     */    
+     *
+     * @return
+     */
     public Boolean getDialogRenderNoButton() {
         return dialogRenderNoButton;
     }
 
     /**
      * Sets the dialogRenderNoButton field.
-     * @param dialogRenderNoButton 
+     *
+     * @param dialogRenderNoButton
      */
     public void setDialogRenderNoButton(Boolean dialogRenderNoButton) {
         this.dialogRenderNoButton = dialogRenderNoButton;
@@ -1304,7 +1316,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the dialogMessage field.
-     * @return 
+     *
+     * @return
      */
     public String getDialogMessage() {
         return dialogMessage;
@@ -1312,7 +1325,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the dialogMessage field.
-     * @param dialogMessage 
+     *
+     * @param dialogMessage
      */
     public void setDialogMessage(String dialogMessage) {
         this.dialogMessage = dialogMessage;
@@ -1320,7 +1334,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the dialogMessageHeader field.
-     * @return 
+     *
+     * @return
      */
     public String getDialogMessageHeader() {
         return dialogMessageHeader;
@@ -1328,7 +1343,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the dialogMessageHeader field.
-     * @param dialogMessageHeader 
+     *
+     * @param dialogMessageHeader
      */
     public void setDialogMessageHeader(String dialogMessageHeader) {
         this.dialogMessageHeader = dialogMessageHeader;
@@ -1336,7 +1352,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the dialogMessageSeverity field.
-     * @return 
+     *
+     * @return
      */
     public String getDialogMessageSeverity() {
         return dialogMessageSeverity;
@@ -1344,15 +1361,18 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the dialogMessageSeverity field.
-     * @param dialogMessageSeverity 
+     *
+     * @param dialogMessageSeverity
      */
     public void setDialogMessageSeverity(String dialogMessageSeverity) {
         this.dialogMessageSeverity = dialogMessageSeverity;
     }
 
     /**
-     * Creates and gets an EntityManager object using the EMF1 EntityManagerFactory object. 
-     * @return 
+     * Creates and gets an EntityManager object using the EMF1
+     * EntityManagerFactory object.
+     *
+     * @return
      */
     public EntityManager getEntityManager1() {
         return EMF1.createEntityManager();
@@ -1360,7 +1380,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the logged on user field.
-     * @return 
+     *
+     * @return
      */
     public User getUser() {
         return getJobManager().getUser();
@@ -1368,7 +1389,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the invalidFormFieldMessage field.
-     * @return 
+     *
+     * @return
      */
     @Override
     public String getInvalidFormFieldMessage() {
@@ -1377,7 +1399,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the invalidFormFieldMessage field.
-     * @param invalidFormFieldMessage 
+     *
+     * @param invalidFormFieldMessage
      */
     @Override
     public void setInvalidFormFieldMessage(String invalidFormFieldMessage) {
@@ -1386,13 +1409,14 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Displays a PrimeFaces message dialog.
+     *
      * @param dialogActionHandler
      * @param dialogMessage
      * @param dialogMessageHeader
-     * @param dialoMessageSeverity 
+     * @param dialoMessageSeverity
      */
     public void displayCommonMessageDialog(
-            DialogActionHandler dialogActionHandler, 
+            DialogActionHandler dialogActionHandler,
             String dialogMessage,
             String dialogMessageHeader,
             String dialoMessageSeverity) {
@@ -1413,10 +1437,11 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Displays a PrimeFaces confirmation dialog.
+     *
      * @param dialogActionHandler
      * @param dialogMessage
      * @param dialogMessageHeader
-     * @param dialoMessageSeverity 
+     * @param dialoMessageSeverity
      */
     public void displayCommonConfirmationDialog(DialogActionHandler dialogActionHandler,
             String dialogMessage,
@@ -1476,7 +1501,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the filteredAccPacCustomerDocuments field.
-     * @return 
+     *
+     * @return
      */
     public List<AccPacDocument> getFilteredAccPacCustomerDocuments() {
         return filteredAccPacCustomerDocuments;
@@ -1484,7 +1510,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the filteredAccPacCustomerDocuments field.
-     * @param filteredAccPacCustomerDocuments 
+     *
+     * @param filteredAccPacCustomerDocuments
      */
     public void setFilteredAccPacCustomerDocuments(List<AccPacDocument> filteredAccPacCustomerDocuments) {
         this.filteredAccPacCustomerDocuments = filteredAccPacCustomerDocuments;
@@ -1492,7 +1519,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the showPrepayments field. Sets the field to false if it is null.
-     * @return 
+     *
+     * @return
      */
     public Boolean getShowPrepayments() {
         if (showPrepayments == null) {
@@ -1503,15 +1531,18 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the showPrepayments field.
-     * @param showPrepayments 
+     *
+     * @param showPrepayments
      */
     public void setShowPrepayments(Boolean showPrepayments) {
         this.showPrepayments = showPrepayments;
     }
 
     /**
-     * Gets the jobCostDepartment field. Sets the field to a "no-name" department if it is null.
-     * @return 
+     * Gets the jobCostDepartment field. Sets the field to a "no-name"
+     * department if it is null.
+     *
+     * @return
      */
     public Department getJobCostDepartment() {
         if (jobCostDepartment == null) {
@@ -1522,15 +1553,18 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the jobCostDepartment field.
-     * @param jobCostDepartment 
+     *
+     * @param jobCostDepartment
      */
     public void setJobCostDepartment(Department jobCostDepartment) {
         this.jobCostDepartment = jobCostDepartment;
     }
 
     /**
-     * Gets the currentJobWithCosting field. Sets it to a new Job object if it is null.
-     * @return 
+     * Gets the currentJobWithCosting field. Sets it to a new Job object if it
+     * is null.
+     *
+     * @return
      */
     public Job getCurrentJobWithCosting() {
         if (currentJobWithCosting == null) {
@@ -1541,16 +1575,17 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the currentJobWithCosting field.
-     * @param currentJobWithCosting 
+     *
+     * @param currentJobWithCosting
      */
     public void setCurrentJobWithCosting(Job currentJobWithCosting) {
         this.currentJobWithCosting = currentJobWithCosting;
     }
 
-    
     /**
-     * Gets the jobsWithCostings field. Sets it to an empty list if it is null. 
-     * @return 
+     * Gets the jobsWithCostings field. Sets it to an empty list if it is null.
+     *
+     * @return
      */
     public List<Job> getJobsWithCostings() {
         if (jobsWithCostings == null) {
@@ -1561,7 +1596,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the unitCosts field. Sets it to an empty list if it is null.
-     * @return 
+     *
+     * @return
      */
     public List<UnitCost> getUnitCosts() {
         if (unitCosts == null) {
@@ -1572,8 +1608,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * Gets the currentUnitCost field. Sets it to a new UnitCost object if it is null.
-     * @return 
+     * Gets the currentUnitCost field. Sets it to a new UnitCost object if it is
+     * null.
+     *
+     * @return
      */
     public UnitCost getCurrentUnitCost() {
         if (currentUnitCost == null) {
@@ -1584,15 +1622,18 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the currentUnitCost field.
-     * @param currentUnitCost 
+     *
+     * @param currentUnitCost
      */
     public void setCurrentUnitCost(UnitCost currentUnitCost) {
         this.currentUnitCost = currentUnitCost;
     }
 
     /**
-     * Gets the unitCostDepartment field. Sets it to a "no-name" Department object if it is null.
-     * @return 
+     * Gets the unitCostDepartment field. Sets it to a "no-name" Department
+     * object if it is null.
+     *
+     * @return
      */
     public Department getUnitCostDepartment() {
         if (unitCostDepartment == null) {
@@ -1603,7 +1644,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the unitCostDepartment field.
-     * @param unitCostDepartment 
+     *
+     * @param unitCostDepartment
      */
     public void setUnitCostDepartment(Department unitCostDepartment) {
         this.unitCostDepartment = unitCostDepartment;
@@ -1611,7 +1653,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Determines if the user has the privilege to edit a job costing.
-     * @return 
+     *
+     * @return
      */
     public Boolean getCanEditJobCosting() {
 
@@ -1621,7 +1664,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the selectedJobCostingTemplate field.
-     * @return 
+     *
+     * @return
      */
     public String getSelectedJobCostingTemplate() {
         return selectedJobCostingTemplate;
@@ -1629,7 +1673,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the selectedJobCostingTemplate field.
-     * @param selectedJobCostingTemplate 
+     *
+     * @param selectedJobCostingTemplate
      */
     public void setSelectedJobCostingTemplate(String selectedJobCostingTemplate) {
         this.selectedJobCostingTemplate = selectedJobCostingTemplate;
@@ -1637,8 +1682,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Determines if a job is assigned to the department of the user.
+     *
      * @param job
-     * @return 
+     * @return
      */
     private Boolean isJobAssignedToUserDepartment(Job job) {
 
@@ -1653,10 +1699,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         }
     }
 
-    
     /**
      * Sets the selectedCostComponent field to the PrimeFaces selected object.
-     * @param event 
+     *
+     * @param event
      */
     public void onCostComponentSelect(SelectEvent event) {
         selectedCostComponent = (CostComponent) event.getObject();
@@ -1664,7 +1710,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the selectedCostComponent field.
-     * @return 
+     *
+     * @return
      */
     public CostComponent getSelectedCostComponent() {
         return selectedCostComponent;
@@ -1672,7 +1719,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the selectedCostComponent field.
-     * @param selectedCostComponent 
+     *
+     * @param selectedCostComponent
      */
     public void setSelectedCostComponent(CostComponent selectedCostComponent) {
         this.selectedCostComponent = selectedCostComponent;
@@ -1680,7 +1728,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the useAccPacCustomerList field.
-     * @return 
+     *
+     * @return
      */
     public Boolean getUseAccPacCustomerList() {
         return useAccPacCustomerList;
@@ -1688,16 +1737,19 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the useAccPacCustomerList field.
-     * @param useAccPacCustomerList 
+     *
+     * @param useAccPacCustomerList
      */
     public void setUseAccPacCustomerList(Boolean useAccPacCustomerList) {
         this.useAccPacCustomerList = useAccPacCustomerList;
     }
 
     /**
-     * Gets the number of documents that are due/overdue by the given number of days.
+     * Gets the number of documents that are due/overdue by the given number of
+     * days.
+     *
      * @param days
-     * @return 
+     * @return
      */
     public Integer getNumberOfDocumentsPassDocDate(Integer days) {
         Integer count = 0;
@@ -1713,9 +1765,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the status of a financial account as "hold" or "active" based on the
-     * the total cost of outstanding invoices that are overdue by the maximum 
+     * the total cost of outstanding invoices that are overdue by the maximum
      * allowed number of days.
-     * @return 
+     *
+     * @return
      */
     public String getAccountStatus() {
         if (getTotalInvoicesAmountOverMaxInvDays().doubleValue() > 0.0
@@ -1729,7 +1782,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     /**
      * Gets the total cost of invoices that are pass the maximum allowed overdue
      * days.
-     * @return 
+     *
+     * @return
      */
     public BigDecimal getTotalInvoicesAmountOverMaxInvDays() {
         BigDecimal total = new BigDecimal(0.0);
@@ -1744,8 +1798,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * Gets the total cost of invoices in the filteredAccPacCustomerDocuments field.
-     * @return 
+     * Gets the total cost of invoices in the filteredAccPacCustomerDocuments
+     * field.
+     *
+     * @return
      */
     public BigDecimal getTotalInvoicesAmount() {
         BigDecimal total = new BigDecimal(0.0);
@@ -1759,7 +1815,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the maximum allowed overdue days for invoices.
-     * @return 
+     *
+     * @return
      */
     public Integer getMaxDaysPassInvoiceDate() {
 
@@ -1771,8 +1828,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * Get status based on the total amount on documents/invoices pass the max allowed
-     * days pass the invoice date.
+     * Get status based on the total amount on documents/invoices pass the max
+     * allowed days pass the invoice date.
      *
      * @return
      */
@@ -1786,18 +1843,20 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * Gets the number of documents/invoices that are pass the maximum allowed 
+     * Gets the number of documents/invoices that are pass the maximum allowed
      * overdue days.
-     * @return 
+     *
+     * @return
      */
     public Integer getNumDocumentsPassMaxInvDate() {
         return getNumberOfDocumentsPassDocDate(getMaxDaysPassInvoiceDate());
     }
 
     /**
-     * Updates and gets the longProcessProgress field that stores the progress 
+     * Updates and gets the longProcessProgress field that stores the progress
      * of a server activity.
-     * @return 
+     *
+     * @return
      */
     public Integer getLongProcessProgress() {
         if (longProcessProgress == null) {
@@ -1814,8 +1873,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * A callback method that is called when an activity is complete. 
-     * The longProcessProgress field is set to 0.
+     * A callback method that is called when an activity is complete. The
+     * longProcessProgress field is set to 0.
      */
     public void onLongProcessComplete() {
         longProcessProgress = 0;
@@ -1823,7 +1882,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Sets the longProcessProgress field.
-     * @param longProcessProgress 
+     *
+     * @param longProcessProgress
      */
     public void setLongProcessProgress(Integer longProcessProgress) {
         this.longProcessProgress = longProcessProgress;
@@ -1831,8 +1891,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the filled Jasper Report Job Costing form as StreamedContent object.
+     *
      * @param em
-     * @return 
+     * @return
      */
     public StreamedContent getJobCostingAnalysisFile(EntityManager em) {
 
@@ -1910,9 +1971,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * Gets the Jasper Report Job Costing file as a StreamedContent object within
-     * a "long process" server activity.
-     * @return 
+     * Gets the Jasper Report Job Costing file as a StreamedContent object
+     * within a "long process" server activity.
+     *
+     * @return
      */
     public StreamedContent getJobCostingFile() {
         EntityManager em;
@@ -1939,22 +2001,24 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Determines if the user can export a job costing.
-     * @return 
+     *
+     * @return
      */
     public Boolean getCanExportJobCosting() {
         return !(getCurrentJob().getJobCostingAndPayment().getCostingApproved()
                 && getCurrentJob().getJobCostingAndPayment().getCostingCompleted());
     }
-    
+
     public Boolean getDisableJobCostingEdit() {
-         return getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                 || getCurrentJob().getJobCostingAndPayment().getInvoiced()
-                 || getCurrentJob().getJobCostingAndPayment().getCostingApproved();
+        return getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Completed")
+                || getCurrentJob().getJobCostingAndPayment().getInvoiced()
+                || getCurrentJob().getJobCostingAndPayment().getCostingApproved();
     }
 
     /**
      * Prepares to invoice a job costing.
-     * @param job 
+     *
+     * @param job
      */
     private void prepareToInvoiceJobCosting(Job job) {
 
@@ -1985,8 +2049,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Determines if a job costing can be exported.
+     *
      * @param job
-     * @return 
+     * @return
      */
     public Boolean canExportInvoice(Job job) {
 
@@ -2024,10 +2089,11 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     /**
-     * Determines if a job costing can be invoiced. A PrimeFaces message is displayed
-     * if the job costing cannot be invoiced.
+     * Determines if a job costing can be invoiced. A PrimeFaces message is
+     * displayed if the job costing cannot be invoiced.
+     *
      * @param job
-     * @return 
+     * @return
      */
     public Boolean canInvoiceJobCosting(Job job) {
 
@@ -2069,10 +2135,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     }
 
-    
     /**
      * Gets all Job TableView preferences.
-     * @return 
+     *
+     * @return
      */
     public List<Preference> getJobTableViewPreferences() {
         EntityManager em = getEntityManager1();
@@ -2096,7 +2162,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Gets the selected Cash Payment object.
-     * @return 
+     *
+     * @return
      */
     public CashPayment getSelectedCashPayment() {
         return selectedCashPayment;
@@ -2105,7 +2172,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     /**
      * Sets the selected Cash Payment object. The related costs are updated and
      * the is corresponding job is saved.
-     * @param selectedCashPayment 
+     *
+     * @param selectedCashPayment
      */
     public void setSelectedCashPayment(CashPayment selectedCashPayment) {
 
@@ -2118,8 +2186,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             updateAmountDue();
 
             if (!getCurrentJob().prepareAndSave(getEntityManager1(), getUser()).isSuccess()) {
-                PrimeFacesUtils.addMessage("Payment and Job NOT Saved!", 
-                        "Payment and the job and the payment were NOT saved!", 
+                PrimeFacesUtils.addMessage("Payment and Job NOT Saved!",
+                        "Payment and the job and the payment were NOT saved!",
                         FacesMessage.SEVERITY_ERROR);
             }
         }
@@ -2127,14 +2195,16 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * Creates and gets Entity Manager 2.
-     * @return 
+     *
+     * @return
      */
     public EntityManager getEntityManager2() {
         return getEMF2().createEntityManager();
     }
 
     /**
-     * Updates the status of the current job costing and payment as being edited.
+     * Updates the status of the current job costing and payment as being
+     * edited.
      */
     public void updateJobCostingAndPayment() {
         setJobCostingAndPaymentDirty(true);
@@ -2414,7 +2484,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     public void approveJobCosting() {
 
-        if (canChangeJobCostingApprovalStatus(getCurrentJob())) {
+        if (canChangeJobCostingApprovalStatus(getCurrentJob(), false)) {
             if (getCurrentJob().getJobCostingAndPayment().getCostingApproved()) {
                 getCurrentJob().getJobStatusAndTracking().setDateCostingApproved(new Date());
                 getCurrentJob().getJobCostingAndPayment().setCostingApprovedBy(
@@ -2431,7 +2501,63 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         }
     }
 
+    /* tk keep until edited
     public Boolean canChangeJobCostingApprovalStatus(Job job) {
+
+        if (!job.getJobCostingAndPayment().getCostingCompleted()
+                || job.getJobCostingAndPayment().getInvoiced()) {
+
+            PrimeFacesUtils.addMessage("Cannot Change Approval Status",
+                    "The job costing approval status for " + job.getJobNumber()
+                    + " cannot be changed before the job costing is prepared or if it was already invoiced",
+                    FacesMessage.SEVERITY_ERROR);
+
+            return false;
+
+        } else if (isUserDepartmentSupervisor(job)
+                || (isJobAssignedToUserDepartment(job)
+                && getUser().getPrivilege().getCanApproveJobCosting())) {
+
+            return true;
+
+        } else {
+
+            PrimeFacesUtils.addMessage("No Permission",
+                    "You do not have the permission to change the job costing approval status for " + job.getJobNumber(),
+                    FacesMessage.SEVERITY_ERROR);
+
+            return false;
+
+        }
+    }
+     */
+    
+    private Boolean areThereUnapprovedSubcontracts(Job job) {
+        if (job.getSubcontracts(getEntityManager1()).isEmpty()) {
+            return false;
+        }
+        else {
+            for (Job subContract :  job.getSubcontracts(getEntityManager1())) {
+                if (!subContract.getJobCostingAndPayment().getCostingApproved()) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    public Boolean canChangeJobCostingApprovalStatus(Job job, Boolean approve) {
+        
+        if (areThereUnapprovedSubcontracts(job) && 
+                (job.getJobCostingAndPayment().getCostingApproved() || approve)) {
+            PrimeFacesUtils.addMessage("Cannot Approve Job Costing",
+                    "The job costing for " + job.getJobNumber()
+                    + " cannot be approved until all subcontracts are approved",
+                    FacesMessage.SEVERITY_ERROR);
+            
+            return false;
+        }
 
         if (!job.getJobCostingAndPayment().getCostingCompleted()
                 || job.getJobCostingAndPayment().getInvoiced()) {
