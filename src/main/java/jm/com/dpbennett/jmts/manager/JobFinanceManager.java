@@ -2531,31 +2531,54 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         }
     }
      */
-    
     private Boolean areThereUnapprovedSubcontracts(Job job) {
         if (job.getSubcontracts(getEntityManager1()).isEmpty()) {
             return false;
-        }
-        else {
-            for (Job subContract :  job.getSubcontracts(getEntityManager1())) {
+        } else {
+            for (Job subContract : job.getSubcontracts(getEntityManager1())) {
                 if (!subContract.getJobCostingAndPayment().getCostingApproved()) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
-    
+
+    // tk Impl
+    private Boolean areThereSubcontractCostingsToInclude(Job job) {
+        if (job.getSubcontracts(getEntityManager1()).isEmpty()) {
+            return false;
+        } else {
+            for (Job subContract : job.getSubcontracts(getEntityManager1())) {
+//                if (!subContract.getJobCostingAndPayment().getCostingApproved()) {
+//                    return true;
+//                }
+            }
+        }
+
+        return false;
+    }
+
     public Boolean canChangeJobCostingApprovalStatus(Job job, Boolean approve) {
-        
-        if (areThereUnapprovedSubcontracts(job) && 
-                (job.getJobCostingAndPayment().getCostingApproved() || approve)) {
+
+        if (areThereUnapprovedSubcontracts(job)
+                && (job.getJobCostingAndPayment().getCostingApproved() || approve)) {
             PrimeFacesUtils.addMessage("Cannot Approve Job Costing",
                     "The job costing for " + job.getJobNumber()
                     + " cannot be approved until all subcontracts are approved",
                     FacesMessage.SEVERITY_ERROR);
-            
+
+            return false;
+        }
+
+        if (areThereSubcontractCostingsToInclude(job)
+                && (job.getJobCostingAndPayment().getCostingApproved() || approve)) {
+            PrimeFacesUtils.addMessage("Cannot Approve Job Costing",
+                    "The job costing for " + job.getJobNumber()
+                    + " cannot be approved until all subcontract costings are included",
+                    FacesMessage.SEVERITY_ERROR);
+
             return false;
         }
 
