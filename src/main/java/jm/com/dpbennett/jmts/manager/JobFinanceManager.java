@@ -2535,8 +2535,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (job.getSubcontracts(getEntityManager1()).isEmpty()) {
             return false;
         } else {
-            for (Job subContract : job.getSubcontracts(getEntityManager1())) {
-                if (!subContract.getJobCostingAndPayment().getCostingApproved()) {
+            // tk NB: Check that subcontract is not cancelled
+            for (Job subcontract : job.getSubcontracts(getEntityManager1())) {
+                if (!subcontract.getJobCostingAndPayment().getCostingApproved()) {
                     return true;
                 }
             }
@@ -2550,8 +2551,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (job.getSubcontracts(getEntityManager1()).isEmpty()) {
             return false;
         } else {
-            for (Job subContract : job.getSubcontracts(getEntityManager1())) {
-//                if (!subContract.getJobCostingAndPayment().getCostingApproved()) {
+            // tk NB: Check that subcontract is not cancelled
+            for (Job subcontract : job.getSubcontracts(getEntityManager1())) {
+//                if (!subcontract.getJobCostingAndPayment().getCostingApproved()) {
 //                    return true;
 //                }
             }
