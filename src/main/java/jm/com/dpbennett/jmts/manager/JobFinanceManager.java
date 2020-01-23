@@ -2226,6 +2226,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
             selectedCostComponent.setCost(subcontract.getJobCostingAndPayment().getFinalCost());
             selectedCostComponent.setName("Subcontract (" + subcontract.getJobNumber() + ")");
+            selectedCostComponent.setCode(subcontract.getJobNumber());
 
             updateCostComponent();
         }
@@ -3072,6 +3073,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (selectedCostComponent.getId() == null && !getEdit()) {
             getCurrentJob().getJobCostingAndPayment().getCostComponents().add(selectedCostComponent);
         }
+        
         setEdit(false);
         updateFinalCost();
         updateAmountDue();

@@ -1187,6 +1187,16 @@ public class JobManager implements
     public void saveCurrentJob() {
         EntityManager em = getEntityManager1();
         ReturnMessage returnMessage;
+        
+        // Do basic field validation here
+        // Ensure that at least 1 service is selected
+        if (getCurrentJob().getServices().isEmpty()) {
+            PrimeFacesUtils.addMessage("Service(s) NOT Selected ", 
+                    "Please select at least one service", 
+                    FacesMessage.SEVERITY_ERROR);
+            
+            return;
+        }
 
         // Do privelege checks and save if possible
         if (isCurrentJobNew() && getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()) {
