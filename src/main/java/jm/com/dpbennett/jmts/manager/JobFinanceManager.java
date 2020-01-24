@@ -2536,9 +2536,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (job.getSubcontracts(getEntityManager1()).isEmpty()) {
             return false;
         } else {
-            // tk NB: Check that subcontract is not cancelled
             for (Job subcontract : job.getSubcontracts(getEntityManager1())) {
-                if (!subcontract.getJobCostingAndPayment().getCostingApproved()) {
+                if (!subcontract.getJobCostingAndPayment().getCostingApproved() && 
+                        !subcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
                     return true;
                 }
             }
@@ -2546,17 +2546,27 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         return false;
     }
+    
+    private Boolean checkForCostComponentCode(Job job, String code) {
+        
+        for (CostComponent component: job.getJobCostingAndPayment().getCostComponents()) {
+            if (component.getCode().equals(code)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
-    // tk Impl
     private Boolean areThereSubcontractCostingsToInclude(Job job) {
         if (job.getSubcontracts(getEntityManager1()).isEmpty()) {
             return false;
         } else {
-            // tk NB: Check that subcontract is not cancelled
             for (Job subcontract : job.getSubcontracts(getEntityManager1())) {
-//                if (!subcontract.getJobCostingAndPayment().getCostingApproved()) {
-//                    return true;
-//                }
+                if (!checkForCostComponentCode(job, subcontract.getJobNumber()) 
+                        && !subcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
+                    return true;
+                }
             }
         }
 
