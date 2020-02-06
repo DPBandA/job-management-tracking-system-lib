@@ -963,7 +963,7 @@ public class JobManager implements
                     && getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
 
                 PrimeFacesUtils.addMessage("Job Work Progress Cannot Be As Marked Completed",
-                        "The job costing needs to be approved before this job can marked as completed.",
+                        "The job costing needs to be approved before this job can be marked as completed.",
                         FacesMessage.SEVERITY_WARN);
 
                 return false;
@@ -996,7 +996,7 @@ public class JobManager implements
                         setWorkProgress(savedJob.getJobStatusAndTracking().getWorkProgress());
 
                 PrimeFacesUtils.addMessage("Job Work Progress Cannot Be As Marked Completed",
-                        "The job costing needs to be prepared before this job can marked as completed.",
+                        "The job costing needs to be prepared before this job can be marked as completed.",
                         FacesMessage.SEVERITY_WARN);
 
                 return false;
