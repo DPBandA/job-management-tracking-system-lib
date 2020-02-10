@@ -1216,7 +1216,8 @@ public class JobManager implements
 
         // Check if there exists another subcontract with the same job number.
         Job savedSubcontract = Job.findJobByJobNumber(getEntityManager1(), getCurrentJob().getJobNumber());
-        if (savedSubcontract != null && isCurrentJobNew()) {
+        if (savedSubcontract != null && isCurrentJobNew() 
+                && !savedSubcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
             PrimeFacesUtils.addMessage("Subcontract already exists!",
                     "This subcontract cannot be saved because another subcontract already exists with the same job number",
                     FacesMessage.SEVERITY_ERROR);
