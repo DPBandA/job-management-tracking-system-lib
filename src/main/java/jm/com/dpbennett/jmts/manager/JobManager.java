@@ -870,6 +870,15 @@ public class JobManager implements
     public void updateJob(AjaxBehaviorEvent event) {
         setIsDirty(true);
     }
+    
+    public void updateStartDate(AjaxBehaviorEvent event) {
+        if ((getCurrentJob().getJobStatusAndTracking().getStartDate() != null)
+                && getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Not started")) {
+           getCurrentJob().getJobStatusAndTracking().setWorkProgress("Ongoing");   
+        }
+        
+        setIsDirty(true);
+    }
 
     public void updateJobView(AjaxBehaviorEvent event) {
         getUser().save(getEntityManager1());
