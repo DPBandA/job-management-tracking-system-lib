@@ -2270,17 +2270,31 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     public String getSubcontractsMessage() {
+        List<Job> subcontracts = new ArrayList<>();
+        List<Job> existingSubcontracts = getSubcontractsForCostComponents(getCurrentJob());
+
         if (getCurrentJob().getId() != null) {
             if (!getCurrentJob().findSubcontracts(getEntityManager1()).isEmpty()) {
-                return ("{ " + getCurrentJob().getSubcontracts(getEntityManager1()).size() + " subcontract(s) exist(s) that can be added as cost item(s) }");
+                subcontracts.addAll(getCurrentJob().findSubcontracts(getEntityManager1()));
+                subcontracts.removeAll(existingSubcontracts);
+                if (!subcontracts.isEmpty()) {
+                    return ("{ " + subcontracts.size() + " subcontract(s) exist(s) that can be added as cost item(s) }");
+                }
             } else if (!getCurrentJob().findPossibleSubcontracts(getEntityManager1()).isEmpty()) {
-                return ("{ " + getCurrentJob().getPossibleSubcontracts(getEntityManager1()).size() + " possible subcontract(s) exist(s) that can be added as cost item(s) }");
+                subcontracts.addAll(getCurrentJob().findPossibleSubcontracts(getEntityManager1()));
+                subcontracts.removeAll(existingSubcontracts);
+                if (!subcontracts.isEmpty()) {
+                    return ("{ " + subcontracts.size() + " possible subcontract(s) exist(s) that can be added as cost item(s) }");
+                }
             } else {
                 return "";
             }
         } else {
             return "";
         }
+
+        return "";
+
     }
 
     public void updateMinimumDepositRequired() {
@@ -2537,8 +2551,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             return false;
         } else {
             for (Job subcontract : job.getSubcontracts(getEntityManager1())) {
-                if (!subcontract.getJobCostingAndPayment().getCostingApproved() && 
-                        !subcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
+                if (!subcontract.getJobCostingAndPayment().getCostingApproved()
+                        && !subcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
                     return true;
                 }
             }
@@ -2546,15 +2560,15 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         return false;
     }
-    
+
     private Boolean checkForCostComponentCode(Job job, String code) {
-        
-        for (CostComponent component: job.getJobCostingAndPayment().getCostComponents()) {
+
+        for (CostComponent component : job.getJobCostingAndPayment().getCostComponents()) {
             if (component.getCode().equals(code)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -2563,7 +2577,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             return false;
         } else {
             for (Job subcontract : job.getSubcontracts(getEntityManager1())) {
-                if (!checkForCostComponentCode(job, subcontract.getJobNumber()) 
+                if (!checkForCostComponentCode(job, subcontract.getJobNumber())
                         && !subcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
                     return true;
                 }
@@ -3083,7 +3097,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (selectedCostComponent.getId() == null && !getEdit()) {
             getCurrentJob().getJobCostingAndPayment().getCostComponents().add(selectedCostComponent);
         }
-        
+
         setEdit(false);
         updateFinalCost();
         updateAmountDue();
@@ -3213,8 +3227,29 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         return codes;
     }
 
+    /**
+     * Gets subcontracts for which cost components exists.
+     *
+     * @param job
+     * @return
+     */
+    private List<Job> getSubcontractsForCostComponents(Job job) {
+        List<Job> subcontracts = new ArrayList<>();
+
+        for (Job subcontract : job.getSubcontracts(getEntityManager1())) {
+            if (checkForCostComponentCode(job, subcontract.getJobNumber())
+                    && !subcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
+
+                subcontracts.add(subcontract);
+            }
+        }
+
+        return subcontracts;
+    }
+
     public List<Job> getAllSubcontracts() {
         List<Job> subcontracts = new ArrayList<>();
+        List<Job> existingSubcontracts = getSubcontractsForCostComponents(getCurrentJob());
 
         if (getCurrentJob().getId() != null) {
             if (!getCurrentJob().findSubcontracts(getEntityManager1()).isEmpty()) {
@@ -3223,6 +3258,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                 subcontracts.addAll(getCurrentJob().findPossibleSubcontracts(getEntityManager1()));
             }
 
+            subcontracts.removeAll(existingSubcontracts);
             subcontracts.add(0, new Job("-- select a subcontract --"));
         } else {
             subcontracts.add(0, new Job("-- none exists --"));
