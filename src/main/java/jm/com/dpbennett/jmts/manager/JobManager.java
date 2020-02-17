@@ -1532,7 +1532,7 @@ public class JobManager implements
             case "Financial Administration":
                 getFinanceManager().doSearch();
                 break;
-            case "Document Management":
+            case "Legal Office":
                 getLegalDocumentManager().doSearch();
                 break;
             case "Job Management":
