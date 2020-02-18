@@ -3170,7 +3170,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         try {
             em = getEntityManager1();
 
-            List<JobCostingAndPayment> results = JobCostingAndPayment.findAllJobCostingAndPaymentsByDepartmentAndName(em,
+            List<JobCostingAndPayment> results = JobCostingAndPayment.findAllActiveJobCostingAndPaymentsByDepartmentAndName(em,
                     getUser().getEmployee().getDepartment().getName(), query);
 
             return results;
