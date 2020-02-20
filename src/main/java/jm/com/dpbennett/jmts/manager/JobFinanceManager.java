@@ -2699,7 +2699,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         setIsDirty(true);
     }
 
-    public void closelJobCostingDialog() {
+    public void closeJobCostingDialog() {
         PrimeFaces.current().dialog().closeDynamic(null);
     }
 
