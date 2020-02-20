@@ -70,6 +70,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
+import jm.com.dpbennett.business.entity.hrm.Email;
 import jm.com.dpbennett.business.entity.sm.Alert;
 import jm.com.dpbennett.business.entity.util.BusinessEntityUtils;
 import jm.com.dpbennett.hrm.manager.HumanResourceManager;
@@ -135,12 +136,26 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     private JobContractManager jobContractManager;
     private Boolean edit;
     private String fileDownloadErrorMessage;
+    private List<JobCostingAndPayment> foundJobCostingAndPayments;
 
     /**
      * Creates a new instance of the JobFinanceManager class.
      */
     public JobFinanceManager() {
         init();
+    }
+
+    public List<JobCostingAndPayment> getFoundJobCostingAndPayments() {
+        if (foundJobCostingAndPayments == null) {
+            // tk may hae to impl a find method instead of using this complete method.
+            foundJobCostingAndPayments = completeJobCostingAndPaymentName(""); 
+        }
+        
+        return foundJobCostingAndPayments;
+    }
+
+    public void setFoundJobCostingAndPayments(List<JobCostingAndPayment> foundJobCostingAndPayments) {
+        this.foundJobCostingAndPayments = foundJobCostingAndPayments;
     }
 
     /**
