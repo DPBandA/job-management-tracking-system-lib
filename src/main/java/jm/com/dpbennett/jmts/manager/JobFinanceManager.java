@@ -70,7 +70,6 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
-import jm.com.dpbennett.business.entity.hrm.Email;
 import jm.com.dpbennett.business.entity.sm.Alert;
 import jm.com.dpbennett.business.entity.util.BusinessEntityUtils;
 import jm.com.dpbennett.hrm.manager.HumanResourceManager;
@@ -147,10 +146,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     public List<JobCostingAndPayment> getFoundJobCostingAndPayments() {
         if (foundJobCostingAndPayments == null) {
-            // tk may hae to impl a find method instead of using this complete method.
-            foundJobCostingAndPayments = completeJobCostingAndPaymentName(""); 
+            // tk may have to impl a find method instead of using this complete method.
+            foundJobCostingAndPayments = completeJobCostingAndPaymentName("Temp");
         }
-        
+
         return foundJobCostingAndPayments;
     }
 
@@ -2699,10 +2698,6 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         setIsDirty(true);
     }
 
-    public void closeJobCostingDialog() {
-        PrimeFaces.current().dialog().closeDynamic(null);
-    }
-
     public void closeUnitCostDialog() {
 
         // prompt to save modified job before attempting to create new job
@@ -2715,27 +2710,24 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     }
 
-    public void cancelJobCostingEdit(ActionEvent actionEvent) {
-        setIsDirty(false);
-        PrimeFaces.current().dialog().closeDynamic(null);
-    }
-
-    public void cancelJobCostingAndPayment(ActionEvent actionEvent) {
+    public void cancelJobCostingAndPaymentEdit(ActionEvent actionEvent) {
         EntityManager em = getEntityManager1();
 
-        // refetch costing data from database
+        // Refetch costing data from database
         if (getCurrentJob() != null) {
             if (getCurrentJob().getId() != null) {
                 Job job = Job.findJobById(em, getCurrentJob().getId());
                 getCurrentJob().setJobCostingAndPayment(job.getJobCostingAndPayment());
             }
         }
-
-        setIsDirty(false);
+        
+        setJobCostingAndPaymentDirty(false);
+        
+        PrimeFaces.current().dialog().closeDynamic(null);
     }
 
     public void jobCostingDialogReturn() {
-
+     
         if (getCurrentJob().getId() != null) {
             if (isJobCostingAndPaymentDirty()) {
                 if (getCurrentJob().prepareAndSave(getEntityManager1(), getUser()).isSuccess()) {
@@ -3152,7 +3144,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
             getCurrentJob().getJobCostingAndPayment().setCashPayments(jcp.getCashPayments());
 
-            PrimeFacesUtils.openDialog(null, "/job/finance/jobCostingDialog", true, true, true, 600, 850);
+            PrimeFacesUtils.openDialog(null, "/job/finance/jobCostingDialog", true, true, true, false, 600, 850);
         } else {
             PrimeFacesUtils.addMessage("Job NOT Saved",
                     "Job must be saved before the job costing can be viewed or edited",
@@ -3163,7 +3155,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     public void editJobCosting() {
 
-        PrimeFacesUtils.openDialog(null, "jobCostingDialog", true, true, true, 600, 850);
+        PrimeFacesUtils.openDialog(null, "jobCostingDialog", true, true, true, false, 600, 850);
     }
 
     public void okCashPayment() {
