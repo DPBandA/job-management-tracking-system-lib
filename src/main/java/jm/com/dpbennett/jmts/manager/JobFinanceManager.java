@@ -3557,6 +3557,12 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         }
     }
+    
+    public void onJobCostingAndPaymentCellEdit(CellEditEvent event) {
+
+        getFoundJobCostingAndPayments().get(event.getRowIndex()).doSave(getEntityManager1());
+
+    }
 
     public void removeCurrentJobCostingComponents(EntityManager em) {
 
