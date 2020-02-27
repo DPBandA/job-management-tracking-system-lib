@@ -121,6 +121,12 @@ public class JobManager implements
         init();
     }
 
+    public void onJobCellEdit(CellEditEvent event) {
+        // tk
+        System.out.println("Job number: " + getJobSearchResultList().get(event.getRowIndex()).getJobNumber());
+        //getJobSearchResultList().get(event.getRowIndex()).getJobNumber();
+    }
+
     public String getApplicationHeader() {
         return "Job Management & Tracking System";
     }
@@ -613,9 +619,13 @@ public class JobManager implements
         this.showJobEntry = showJobEntry;
     }
 
-    private Boolean isCurrentJobJobAssignedToUser() {
+    private Boolean isCurrentJobAssignedToUser() {
+        return isJobAssignedToUser(getCurrentJob());
+    }
+
+    private Boolean isJobAssignedToUser(Job job) {
         if (getUser() != null) {
-            return currentJob.getAssignedTo().getId().longValue() == getUser().getEmployee().getId().longValue();
+            return job.getAssignedTo().getId().longValue() == getUser().getEmployee().getId().longValue();
         } else {
             return false;
         }
@@ -870,13 +880,13 @@ public class JobManager implements
     public void updateJob(AjaxBehaviorEvent event) {
         setIsDirty(true);
     }
-    
+
     public void updateStartDate(AjaxBehaviorEvent event) {
         if ((getCurrentJob().getJobStatusAndTracking().getStartDate() != null)
                 && getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Not started")) {
-           getCurrentJob().getJobStatusAndTracking().setWorkProgress("Ongoing");   
+            getCurrentJob().getJobStatusAndTracking().setWorkProgress("Ongoing");
         }
-        
+
         setIsDirty(true);
     }
 
@@ -1187,35 +1197,34 @@ public class JobManager implements
         doJobSearch();
     }
 
-    public void saveAndCloseCurrentJob() {
-        saveCurrentJob();
-        PrimeFacesUtils.closeDialog(null);
-    }
-
-    private void prepareAndSaveCurrentJob() {
+//    public void saveAndCloseCurrentJob() {
+//        saveCurrentJob();
+//        PrimeFacesUtils.closeDialog(null);
+//    }
+    private void prepareAndSaveJob(Job job) {
         ReturnMessage returnMessage;
 
-        returnMessage = getCurrentJob().prepareAndSave(getEntityManager1(), getUser());
+        returnMessage = job.prepareAndSave(getEntityManager1(), getUser());
 
         if (returnMessage.isSuccess()) {
             PrimeFacesUtils.addMessage("Saved!", "Job was saved", FacesMessage.SEVERITY_INFO);
-            getCurrentJob().getJobStatusAndTracking().setEditStatus("        ");
+            job.getJobStatusAndTracking().setEditStatus("        ");
         } else {
             PrimeFacesUtils.addMessage("Job NOT Saved!",
                     "Job was NOT saved. Please contact the System Administrator!",
                     FacesMessage.SEVERITY_ERROR);
 
             sendErrorEmail("An error occurred while saving a job!",
-                    "Job number: " + getCurrentJob().getJobNumber()
+                    "Job number: " + job.getJobNumber()
                     + "\nJMTS User: " + getUser().getUsername()
                     + "\nDate/time: " + new Date()
                     + "\nDetail: " + returnMessage.getDetail());
         }
     }
 
-    public void saveCurrentJob() {       
+    public void saveJob(Job job) {
         // Ensure that at least 1 service is selected
-        if (getCurrentJob().getServices().isEmpty()) {
+        if (job.getServices().isEmpty()) {
             PrimeFacesUtils.addMessage("Service(s) NOT Selected",
                     "Please select at least one service",
                     FacesMessage.SEVERITY_ERROR);
@@ -1224,8 +1233,8 @@ public class JobManager implements
         }
 
         // Check if there exists another subcontract with the same job number.
-        Job savedSubcontract = Job.findJobByJobNumber(getEntityManager1(), getCurrentJob().getJobNumber());
-        if (savedSubcontract != null && isCurrentJobNew() 
+        Job savedSubcontract = Job.findJobByJobNumber(getEntityManager1(), job.getJobNumber());
+        if (savedSubcontract != null && isJobNew(job)
                 && !savedSubcontract.getJobStatusAndTracking().getWorkProgress().equals("Cancelled")) {
             PrimeFacesUtils.addMessage("Subcontract already exists!",
                     "This subcontract cannot be saved because another subcontract already exists with the same job number",
@@ -1235,36 +1244,36 @@ public class JobManager implements
         }
 
         // Do privelege checks and save if possible
-        if (isCurrentJobNew() && getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()) {
-            prepareAndSaveCurrentJob();
-        } else if (isCurrentJobNew() && getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()) {
-            prepareAndSaveCurrentJob();
-        } else if (isCurrentJobNew() && getUser().getPrivilege().getCanEnterJob()) {
-            prepareAndSaveCurrentJob();
-        } else if (isCurrentJobNew()
+        if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()) {
+            prepareAndSaveJob(job);
+        } else if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()) {
+            prepareAndSaveJob(job);
+        } else if (isJobNew(job) && getUser().getPrivilege().getCanEnterJob()) {
+            prepareAndSaveJob(job);
+        } else if (isJobNew(job)
                 && getUser().getPrivilege().getCanEnterDepartmentJob()
-                && getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(getCurrentJob(), getEntityManager1()))) {
-            prepareAndSaveCurrentJob();
-        } else if (isCurrentJobNew()
+                && getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(job, getEntityManager1()))) {
+            prepareAndSaveJob(job);
+        } else if (isJobNew(job)
                 && getUser().getPrivilege().getCanEnterOwnJob()
-                && isCurrentJobJobAssignedToUser()) {
-            prepareAndSaveCurrentJob();
-        } else if (getIsDirty() && !isCurrentJobNew() && getUser().getPrivilege().getCanEditJob()) {
-            prepareAndSaveCurrentJob();
-        } else if (getIsDirty() && !isCurrentJobNew()
+                && isJobAssignedToUser(job)) {
+            prepareAndSaveJob(job);
+        } else if (getIsJobDirty(job) && !isJobNew(job) && getUser().getPrivilege().getCanEditJob()) {
+            prepareAndSaveJob(job);
+        } else if (getIsJobDirty(job) && !isJobNew(job)
                 && getUser().getPrivilege().getCanEditDepartmentJob()
                 && (getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(getCurrentJob(), getEntityManager1()))
-                || getUser().getEmployee().isMemberOf(getCurrentJob().getDepartment()))) {
-            prepareAndSaveCurrentJob();
-        } else if (getIsDirty() && !isCurrentJobNew()
+                || getUser().getEmployee().isMemberOf(job.getDepartment()))) {
+            prepareAndSaveJob(job);
+        } else if (getIsJobDirty(job) && !isJobNew(job)
                 && getUser().getPrivilege().getCanEditOwnJob()
-                && isCurrentJobJobAssignedToUser()) {
-            prepareAndSaveCurrentJob();
-        } else if (getCurrentJob().getIsToBeCopied()) {
-           prepareAndSaveCurrentJob();
-        } else if (getCurrentJob().getIsToBeSubcontracted()) {
-           prepareAndSaveCurrentJob();
-        } else if (!getIsDirty()) {
+                && isJobAssignedToUser(job)) {
+            prepareAndSaveJob(job);
+        } else if (job.getIsToBeCopied()) {
+            prepareAndSaveJob(job);
+        } else if (job.getIsToBeSubcontracted()) {
+            prepareAndSaveJob(job);
+        } else if (!getIsJobDirty(job)) {
             PrimeFacesUtils.addMessage("Already Saved",
                     "Job was not saved because it was not modified or it was recently saved.",
                     FacesMessage.SEVERITY_INFO);
@@ -1277,11 +1286,14 @@ public class JobManager implements
 
     }
 
+    public void saveCurrentJob() {
+        saveJob(getCurrentJob());
+    }
+
     public Boolean checkUserJobEntryPrivilege() {
 
         return getUser().getPrivilege().getCanEnterJob()
                 || getUser().getPrivilege().getCanEnterDepartmentJob()
-                //       || getUser().getDepartment().getPrivilege().getCanEnterJob()
                 || getUser().getPrivilege().getCanEnterOwnJob();
     }
 
@@ -1703,6 +1715,10 @@ public class JobManager implements
         return getCurrentJob().getIsDirty();
     }
 
+    public Boolean getIsJobDirty(Job job) {
+        return job.getIsDirty();
+    }
+
     public void updateSector() {
         setIsDirty(true);
     }
@@ -2010,6 +2026,10 @@ public class JobManager implements
         }
 
         return false;
+    }
+
+    public Boolean isJobNew(Job job) {
+        return (job.getId() == null);
     }
 
     public Boolean isCurrentJobNew() {
