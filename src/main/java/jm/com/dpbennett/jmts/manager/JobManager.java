@@ -122,9 +122,12 @@ public class JobManager implements
     }
 
     public void onJobCellEdit(CellEditEvent event) {
-        // tk
-        System.out.println("Job number: " + getJobSearchResultList().get(event.getRowIndex()).getJobNumber());
-        //getJobSearchResultList().get(event.getRowIndex()).getJobNumber();
+        
+        updateJobWorkProgress(getJobSearchResultList().get(event.getRowIndex()));
+        
+        setIsJobDirty(getJobSearchResultList().get(event.getRowIndex()), true);
+        
+        saveJob(getJobSearchResultList().get(event.getRowIndex()));
     }
 
     public String getApplicationHeader() {
@@ -619,9 +622,9 @@ public class JobManager implements
         this.showJobEntry = showJobEntry;
     }
 
-    private Boolean isCurrentJobAssignedToUser() {
-        return isJobAssignedToUser(getCurrentJob());
-    }
+//    private Boolean isCurrentJobAssignedToUser() {
+//        return isJobAssignedToUser(getCurrentJob());
+//    }
 
     private Boolean isJobAssignedToUser(Job job) {
         if (getUser() != null) {
@@ -971,15 +974,23 @@ public class JobManager implements
     }
 
     public Boolean checkWorkProgressReadinessToBeChanged() {
+        return checkJobWorkProgressReadinessToBeChanged(getCurrentJob());
+    }
+
+    public void updateWorkProgress() {
+        updateJobWorkProgress(getCurrentJob());
+    }
+    
+    public Boolean checkJobWorkProgressReadinessToBeChanged(Job job) {
         EntityManager em = getEntityManager1();
 
         // Find the currently stored job and check it's work status
-        if (getCurrentJob().getId() != null) {
-            Job savedJob = Job.findJobById(em, getCurrentJob().getId());
+        if (job.getId() != null) {
+            Job savedJob = Job.findJobById(em, job.getId());
 
             // Do not allow flagging job as completed unless job costing is approved
-            if (!getCurrentJob().getJobCostingAndPayment().getCostingApproved()
-                    && getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
+            if (!job.getJobCostingAndPayment().getCostingApproved()
+                    && job.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
 
                 PrimeFacesUtils.addMessage("Job Work Progress Cannot Be As Marked Completed",
                         "The job costing needs to be approved before this job can be marked as completed.",
@@ -990,10 +1001,10 @@ public class JobManager implements
 
             if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
                     && !getUser().getPrivilege().getCanBeJMTSAdministrator()
-                    && !getUser().isUserDepartmentSupervisor(getCurrentJob(), em)) {
+                    && !getUser().isUserDepartmentSupervisor(job, em)) {
 
                 // Reset current job to its saved work progress
-                getCurrentJob().getJobStatusAndTracking().
+                job.getJobStatusAndTracking().
                         setWorkProgress(savedJob.getJobStatusAndTracking().getWorkProgress());
 
                 PrimeFacesUtils.addMessage("Job Work Progress Cannot Be Changed",
@@ -1003,15 +1014,15 @@ public class JobManager implements
                 return false;
             } else if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
                     && (getUser().getPrivilege().getCanBeJMTSAdministrator()
-                    || getUser().isUserDepartmentSupervisor(getCurrentJob(), em))) {
+                    || getUser().isUserDepartmentSupervisor(job, em))) {
                 // System admin can change work status even if it's completed.
                 return true;
             } else if (!savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                    && getCurrentJob().getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                    && !getCurrentJob().getJobCostingAndPayment().getCostingCompleted()) {
+                    && job.getJobStatusAndTracking().getWorkProgress().equals("Completed")
+                    && !job.getJobCostingAndPayment().getCostingCompleted()) {
 
                 // Reset current job to its saved work progress
-                getCurrentJob().getJobStatusAndTracking().
+                job.getJobStatusAndTracking().
                         setWorkProgress(savedJob.getJobStatusAndTracking().getWorkProgress());
 
                 PrimeFacesUtils.addMessage("Job Work Progress Cannot Be As Marked Completed",
@@ -1031,52 +1042,52 @@ public class JobManager implements
 
         return true;
     }
+    
+    public void updateJobWorkProgress(Job job) {
 
-    public void updateWorkProgress() {
-
-        if (checkWorkProgressReadinessToBeChanged()) {
-            if (!currentJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
-                currentJob.getJobStatusAndTracking().setCompleted(false);
-                currentJob.getJobStatusAndTracking().setSamplesCollected(false);
-                currentJob.getJobStatusAndTracking().setDocumentCollected(false);
+        if (checkJobWorkProgressReadinessToBeChanged(job)) {
+            if (!job.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
+                job.getJobStatusAndTracking().setCompleted(false);
+                job.getJobStatusAndTracking().setSamplesCollected(false);
+                job.getJobStatusAndTracking().setDocumentCollected(false);
                 // overall job completion
-                currentJob.getJobStatusAndTracking().setDateOfCompletion(null);
-                currentJob.getJobStatusAndTracking().
+                job.getJobStatusAndTracking().setDateOfCompletion(null);
+                job.getJobStatusAndTracking().
                         setCompletedBy(null);
                 // sample collection
-                currentJob.getJobStatusAndTracking().setSamplesCollectedBy(null);
-                currentJob.getJobStatusAndTracking().setDateSamplesCollected(null);
+                job.getJobStatusAndTracking().setSamplesCollectedBy(null);
+                job.getJobStatusAndTracking().setDateSamplesCollected(null);
                 // document collection
-                currentJob.getJobStatusAndTracking().setDocumentCollectedBy(null);
-                currentJob.getJobStatusAndTracking().setDateDocumentCollected(null);
+                job.getJobStatusAndTracking().setDocumentCollectedBy(null);
+                job.getJobStatusAndTracking().setDateDocumentCollected(null);
 
                 // Update start date
-                if (currentJob.getJobStatusAndTracking().getWorkProgress().equals("Ongoing")
-                        && currentJob.getJobStatusAndTracking().getStartDate() == null) {
-                    currentJob.getJobStatusAndTracking().setStartDate(new Date());
-                } else if (currentJob.getJobStatusAndTracking().getWorkProgress().equals("Not started")) {
-                    currentJob.getJobStatusAndTracking().setStartDate(null);
+                if (job.getJobStatusAndTracking().getWorkProgress().equals("Ongoing")
+                        && job.getJobStatusAndTracking().getStartDate() == null) {
+                    job.getJobStatusAndTracking().setStartDate(new Date());
+                } else if (job.getJobStatusAndTracking().getWorkProgress().equals("Not started")) {
+                    job.getJobStatusAndTracking().setStartDate(null);
                 }
 
             } else {
-                currentJob.getJobStatusAndTracking().setCompleted(true);
-                currentJob.getJobStatusAndTracking().setDateOfCompletion(new Date());
-                currentJob.getJobStatusAndTracking().
+                job.getJobStatusAndTracking().setCompleted(true);
+                job.getJobStatusAndTracking().setDateOfCompletion(new Date());
+                job.getJobStatusAndTracking().
                         setCompletedBy(getUser().getEmployee());
             }
 
             setIsDirty(true);
         } else {
-            if (getCurrentJob().getId() != null) {
+            if (job.getId() != null) {
                 // Reset work progress to the currently saved state
-                Job job = Job.findJobById(getEntityManager1(), getCurrentJob().getId());
-                if (job != null) {
-                    getCurrentJob().getJobStatusAndTracking().setWorkProgress(job.getJobStatusAndTracking().getWorkProgress());
+                Job job1 = Job.findJobById(getEntityManager1(), job.getId());
+                if (job1 != null) {
+                    job.getJobStatusAndTracking().setWorkProgress(job1.getJobStatusAndTracking().getWorkProgress());
                 } else {
-                    getCurrentJob().getJobStatusAndTracking().setWorkProgress("Not started");
+                    job.getJobStatusAndTracking().setWorkProgress("Not started");
                 }
             } else {
-                getCurrentJob().getJobStatusAndTracking().setWorkProgress("Not started");
+                job.getJobStatusAndTracking().setWorkProgress("Not started");
             }
         }
 
@@ -1262,7 +1273,7 @@ public class JobManager implements
             prepareAndSaveJob(job);
         } else if (getIsJobDirty(job) && !isJobNew(job)
                 && getUser().getPrivilege().getCanEditDepartmentJob()
-                && (getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(getCurrentJob(), getEntityManager1()))
+                && (getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(job, getEntityManager1()))
                 || getUser().getEmployee().isMemberOf(job.getDepartment()))) {
             prepareAndSaveJob(job);
         } else if (getIsJobDirty(job) && !isJobNew(job)
@@ -1657,14 +1668,14 @@ public class JobManager implements
         return jobSearchResultList;
     }
 
-    public /*synchronized*/ Job getCurrentJob() {
+    public Job getCurrentJob() {
         if (currentJob == null) {
             resetCurrentJob();
         }
         return currentJob;
     }
 
-    public /*synchronized*/ void setCurrentJob(Job currentJob) {
+    public void setCurrentJob(Job currentJob) {
         this.currentJob = currentJob;
     }
 
@@ -1702,17 +1713,21 @@ public class JobManager implements
 
     @Override
     public void setIsDirty(Boolean dirty) {
-        getCurrentJob().setIsDirty(dirty);
-        if (dirty) {
-            getCurrentJob().getJobStatusAndTracking().setEditStatus("(edited)");
-        } else {
-            getCurrentJob().getJobStatusAndTracking().setEditStatus("        ");
-        }
+        setIsJobDirty(getCurrentJob(), dirty);
     }
 
     @Override
     public Boolean getIsDirty() {
-        return getCurrentJob().getIsDirty();
+        return getIsJobDirty(getCurrentJob());
+    }
+    
+    public void setIsJobDirty(Job job, Boolean dirty) {
+        job.setIsDirty(dirty);
+        if (dirty) {
+            job.getJobStatusAndTracking().setEditStatus("(edited)");
+        } else {
+            job.getJobStatusAndTracking().setEditStatus("        ");
+        }
     }
 
     public Boolean getIsJobDirty(Job job) {
