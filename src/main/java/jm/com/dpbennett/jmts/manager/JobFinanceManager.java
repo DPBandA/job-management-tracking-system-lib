@@ -136,6 +136,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     private Boolean edit;
     private String fileDownloadErrorMessage;
     private List<JobCostingAndPayment> foundJobCostingAndPayments;
+    private Boolean isActiveJobCostingAndPaymentsOnly;
 
     /**
      * Creates a new instance of the JobFinanceManager class.
@@ -144,10 +145,28 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         init();
     }
 
+    public Boolean getIsActiveJobCostingAndPaymentsOnly() {
+        return isActiveJobCostingAndPaymentsOnly;
+    }
+
+    public void setIsActiveJobCostingAndPaymentsOnly(Boolean isActiveJobCostingAndPaymentsOnly) {
+        this.isActiveJobCostingAndPaymentsOnly = isActiveJobCostingAndPaymentsOnly;
+    }
+    
+     public void doJobCostingAndPaymentSearch() {
+
+        if (getIsActiveJobCostingAndPaymentsOnly()) {
+            foundJobCostingAndPayments = completeJobCostingAndPaymentName(""); // tk search for active
+        } else {
+            foundJobCostingAndPayments = completeAllJobCostingAndPaymentName(""); // tk 
+        }
+
+    }
+
     public List<JobCostingAndPayment> getFoundJobCostingAndPayments() {
         if (foundJobCostingAndPayments == null) {
             // tk may have to impl a find method instead of using this complete method.
-            foundJobCostingAndPayments = completeJobCostingAndPaymentName("Temp");
+            foundJobCostingAndPayments = completeJobCostingAndPaymentName("");
         }
 
         return foundJobCostingAndPayments;
@@ -1216,7 +1235,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         unitCostDepartment = null;
         jobCostDepartment = null;
         filteredAccPacCustomerDocuments = new ArrayList<>();
-
+        isActiveJobCostingAndPaymentsOnly = true;
     }
 
     /**
@@ -3178,6 +3197,24 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             em = getEntityManager1();
 
             List<JobCostingAndPayment> results = JobCostingAndPayment.findAllActiveJobCostingAndPaymentsByDepartmentAndName(em,
+                    getUser().getEmployee().getDepartment().getName(), query);
+
+            return results;
+
+        } catch (Exception e) {
+            System.out.println(e);
+
+            return new ArrayList<>();
+        }
+    }
+    
+    public List<JobCostingAndPayment> completeAllJobCostingAndPaymentName(String query) {
+        EntityManager em;
+
+        try {
+            em = getEntityManager1();
+
+            List<JobCostingAndPayment> results = JobCostingAndPayment.findAllJobCostingAndPaymentsByDepartmentAndName(em,
                     getUser().getEmployee().getDepartment().getName(), query);
 
             return results;
