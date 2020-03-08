@@ -137,12 +137,21 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     private String fileDownloadErrorMessage;
     private List<JobCostingAndPayment> foundJobCostingAndPayments;
     private Boolean isActiveJobCostingAndPaymentsOnly;
+    private String jobCostingAndPaymentSearchText;
 
     /**
      * Creates a new instance of the JobFinanceManager class.
      */
     public JobFinanceManager() {
         init();
+    }
+
+    public String getJobCostingAndPaymentSearchText() {
+        return jobCostingAndPaymentSearchText;
+    }
+
+    public void setJobCostingAndPaymentSearchText(String jobCostingAndPaymentSearchText) {
+        this.jobCostingAndPaymentSearchText = jobCostingAndPaymentSearchText;
     }
 
     public Boolean getIsActiveJobCostingAndPaymentsOnly() {
@@ -156,16 +165,18 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
      public void doJobCostingAndPaymentSearch() {
 
         if (getIsActiveJobCostingAndPaymentsOnly()) {
-            foundJobCostingAndPayments = completeJobCostingAndPaymentName(""); // tk search for active
+            foundJobCostingAndPayments = 
+                    completeJobCostingAndPaymentName(getJobCostingAndPaymentSearchText());
         } else {
-            foundJobCostingAndPayments = completeAllJobCostingAndPaymentName(""); // tk 
+            foundJobCostingAndPayments = 
+                    completeAllJobCostingAndPaymentName(getJobCostingAndPaymentSearchText());
         }
 
     }
 
     public List<JobCostingAndPayment> getFoundJobCostingAndPayments() {
         if (foundJobCostingAndPayments == null) {
-            // tk may have to impl a find method instead of using this complete method.
+       
             foundJobCostingAndPayments = completeJobCostingAndPaymentName("");
         }
 
@@ -1236,6 +1247,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         jobCostDepartment = null;
         filteredAccPacCustomerDocuments = new ArrayList<>();
         isActiveJobCostingAndPaymentsOnly = true;
+        jobCostingAndPaymentSearchText = "";
     }
 
     /**
@@ -3197,7 +3209,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             em = getEntityManager1();
 
             List<JobCostingAndPayment> results = JobCostingAndPayment.findAllActiveJobCostingAndPaymentsByDepartmentAndName(em,
-                    getUser().getEmployee().getDepartment().getName(), query);
+                    Department.findDepartmentAssignedToJob(getCurrentJob(), em).getName(), query);
 
             return results;
 
@@ -3215,7 +3227,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             em = getEntityManager1();
 
             List<JobCostingAndPayment> results = JobCostingAndPayment.findAllJobCostingAndPaymentsByDepartmentAndName(em,
-                    getUser().getEmployee().getDepartment().getName(), query);
+                    Department.findDepartmentAssignedToJob(getCurrentJob(), em).getName(), query);
 
             return results;
 
@@ -3578,8 +3590,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (selectedJobCostingTemplate != null) {
             EntityManager em = getEntityManager1();
             JobCostingAndPayment jcp
-                    = JobCostingAndPayment.findJobCostingAndPaymentByDepartmentAndName(em,
-                            getUser().getEmployee().getDepartment().getName(),
+                    = JobCostingAndPayment.findActiveJobCostingAndPaymentByDepartmentAndName(em,
+                           Department.findDepartmentAssignedToJob(getCurrentJob(), em).getName(),
                             selectedJobCostingTemplate);
             if (jcp != null) {
                 getCurrentJob().getJobCostingAndPayment().getCostComponents().clear();
