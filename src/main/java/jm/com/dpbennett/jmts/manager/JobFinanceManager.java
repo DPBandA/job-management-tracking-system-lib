@@ -1248,6 +1248,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         filteredAccPacCustomerDocuments = new ArrayList<>();
         isActiveJobCostingAndPaymentsOnly = true;
         jobCostingAndPaymentSearchText = "";
+        selectedJobCostingTemplate = "";
     }
 
     /**
@@ -3160,6 +3161,12 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         return JobCostingAndPayment.getCanApplyTax(getCurrentJob())
                 && getCanEditJobCosting();
+    }
+    
+    public Boolean getCanApproveJobCosting() {
+        return (isUserDepartmentSupervisor(getCurrentJob())
+                || (isJobAssignedToUserDepartment(getCurrentJob())
+                && getUser().getPrivilege().getCanApproveJobCosting()));
     }
 
     public void openJobCostingDialog() {
