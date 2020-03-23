@@ -161,22 +161,22 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     public void setIsActiveJobCostingAndPaymentsOnly(Boolean isActiveJobCostingAndPaymentsOnly) {
         this.isActiveJobCostingAndPaymentsOnly = isActiveJobCostingAndPaymentsOnly;
     }
-    
-     public void doJobCostingAndPaymentSearch() {
+
+    public void doJobCostingAndPaymentSearch() {
 
         if (getIsActiveJobCostingAndPaymentsOnly()) {
-            foundJobCostingAndPayments = 
-                    completeJobCostingAndPaymentName(getJobCostingAndPaymentSearchText());
+            foundJobCostingAndPayments
+                    = completeJobCostingAndPaymentName(getJobCostingAndPaymentSearchText());
         } else {
-            foundJobCostingAndPayments = 
-                    completeAllJobCostingAndPaymentName(getJobCostingAndPaymentSearchText());
+            foundJobCostingAndPayments
+                    = completeAllJobCostingAndPaymentName(getJobCostingAndPaymentSearchText());
         }
 
     }
 
     public List<JobCostingAndPayment> getFoundJobCostingAndPayments() {
         if (foundJobCostingAndPayments == null) {
-       
+
             foundJobCostingAndPayments = completeJobCostingAndPaymentName("");
         }
 
@@ -2752,14 +2752,14 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                 getCurrentJob().setJobCostingAndPayment(job.getJobCostingAndPayment());
             }
         }
-        
+
         setJobCostingAndPaymentDirty(false);
-        
+
         PrimeFaces.current().dialog().closeDynamic(null);
     }
 
     public void jobCostingDialogReturn() {
-     
+
         if (getCurrentJob().getId() != null) {
             if (isJobCostingAndPaymentDirty()) {
                 if (getCurrentJob().prepareAndSave(getEntityManager1(), getUser()).isSuccess()) {
@@ -3162,7 +3162,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         return JobCostingAndPayment.getCanApplyTax(getCurrentJob())
                 && getCanEditJobCosting();
     }
-    
+
     public Boolean getCanApproveJobCosting() {
         return (isUserDepartmentSupervisor(getCurrentJob())
                 || (isJobAssignedToUserDepartment(getCurrentJob())
@@ -3226,7 +3226,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             return new ArrayList<>();
         }
     }
-    
+
     public List<JobCostingAndPayment> completeAllJobCostingAndPaymentName(String query) {
         EntityManager em;
 
@@ -3350,6 +3350,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     public void setJobCostingAndPaymentDirty(Boolean dirty) {
         getCurrentJob().getJobCostingAndPayment().setIsDirty(dirty);
+        getCurrentJob().setIsDirty(dirty);
 
         if (dirty) {
             getCurrentJob().getJobStatusAndTracking().setEditStatus("(edited)");
@@ -3598,7 +3599,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             EntityManager em = getEntityManager1();
             JobCostingAndPayment jcp
                     = JobCostingAndPayment.findActiveJobCostingAndPaymentByDepartmentAndName(em,
-                           Department.findDepartmentAssignedToJob(getCurrentJob(), em).getName(),
+                            Department.findDepartmentAssignedToJob(getCurrentJob(), em).getName(),
                             selectedJobCostingTemplate);
             if (jcp != null) {
                 getCurrentJob().getJobCostingAndPayment().getCostComponents().clear();
@@ -3613,7 +3614,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         }
     }
-    
+
     public void onJobCostingAndPaymentCellEdit(CellEditEvent event) {
 
         getFoundJobCostingAndPayments().get(event.getRowIndex()).doSave(getEntityManager1());
