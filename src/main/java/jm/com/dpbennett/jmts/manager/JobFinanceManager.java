@@ -2500,6 +2500,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             setJobCostingAndPaymentDirty(true);
         }
     }
+    
+    public Boolean getCanPrepareJobCosting () {
+        return !getCurrentJob().getJobCostingAndPayment().getCostingApproved();
+    }
 
     public void prepareJobCosting() {
 
