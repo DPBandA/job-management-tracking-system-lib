@@ -1257,6 +1257,11 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     public void reset() {
         init();
     }
+    
+    public Boolean getEnableSubcontractWithCosting() {
+        return (Boolean) SystemOption.getOptionValueObject(getEntityManager1(), 
+                "enableSubcontractWithCosting");
+    }
 
     /**
      * Gets the enableOnlyPaymentEditing field. Sets it to false if it is null.
@@ -3168,9 +3173,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     public Boolean getCanApproveJobCosting() {
-        return (isUserDepartmentSupervisor(getCurrentJob())
+        return ((isUserDepartmentSupervisor(getCurrentJob())
                 || (isJobAssignedToUserDepartment(getCurrentJob())
-                && getUser().getPrivilege().getCanApproveJobCosting()));
+                && getUser().getPrivilege().getCanApproveJobCosting()))
+                && !getCurrentJob().getJobCostingAndPayment().getInvoiced());
     }
 
     public void openJobCostingDialog() {
