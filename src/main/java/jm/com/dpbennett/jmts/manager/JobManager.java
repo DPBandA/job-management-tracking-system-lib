@@ -122,11 +122,11 @@ public class JobManager implements
     }
 
     public void onJobCellEdit(CellEditEvent event) {
-        
+
         updateJobWorkProgress(getJobSearchResultList().get(event.getRowIndex()));
-        
+
         setIsJobDirty(getJobSearchResultList().get(event.getRowIndex()), true);
-        
+
         saveJob(getJobSearchResultList().get(event.getRowIndex()));
     }
 
@@ -625,7 +625,6 @@ public class JobManager implements
 //    private Boolean isCurrentJobAssignedToUser() {
 //        return isJobAssignedToUser(getCurrentJob());
 //    }
-
     private Boolean isJobAssignedToUser(Job job) {
         if (getUser() != null) {
             return job.getAssignedTo().getId().longValue() == getUser().getEmployee().getId().longValue();
@@ -723,7 +722,7 @@ public class JobManager implements
         EntityManager em = getEntityManager1();
 
         if (checkUserJobEntryPrivilege()) {
-            createJob(em, false);
+            createJob(em, false, false);
             getJobFinanceManager().setEnableOnlyPaymentEditing(false);
             PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, 600, 975);
             openJobBrowser();
@@ -980,7 +979,7 @@ public class JobManager implements
     public void updateWorkProgress() {
         updateJobWorkProgress(getCurrentJob());
     }
-    
+
     public Boolean checkJobWorkProgressReadinessToBeChanged(Job job) {
         EntityManager em = getEntityManager1();
 
@@ -1042,7 +1041,7 @@ public class JobManager implements
 
         return true;
     }
-    
+
     public void updateJobWorkProgress(Job job) {
 
         if (checkJobWorkProgressReadinessToBeChanged(job)) {
@@ -1096,10 +1095,10 @@ public class JobManager implements
     public void resetCurrentJob() {
         EntityManager em = getEntityManager1();
 
-        createJob(em, false);
+        createJob(em, false, false);
     }
 
-    public Boolean createJob(EntityManager em, Boolean isSubcontract) {
+    public Boolean createJob(EntityManager em, Boolean isSubcontract, Boolean copyCosting) {
 
         try {
             if (isSubcontract) {
@@ -1116,6 +1115,12 @@ public class JobManager implements
                 currentJob.setIsToBeSubcontracted(isSubcontract);
                 currentJob.setYearReceived(yearReceived);
                 currentJob.setJobSequenceNumber(currentJobSequenceNumber);
+
+                if (copyCosting) {
+                    currentJob.getJobCostingAndPayment().setCostComponents(
+                            getJobFinanceManager().copyCostComponents(parent.getJobCostingAndPayment().getCostComponents()));
+                    currentJob.getJobCostingAndPayment().setIsDirty(true);
+                }
 
             } else {
                 currentJob = Job.create(em, getUser(), true);
@@ -1149,7 +1154,7 @@ public class JobManager implements
         // handle user privilege and return if the user does not have
         // the privilege to do what they wish
         EntityManager em = getEntityManager1();
-        createJob(em, false);
+        createJob(em, false, false);
 
         // fill in fields from service request
         currentJob.setBusinessOffice(serviceRequest.getBusinessOffice());
@@ -1180,9 +1185,36 @@ public class JobManager implements
             return;
         }
 
-        if (createJob(em, true)) {
+        if (createJob(em, true, false)) {
             PrimeFacesUtils.addMessage("Job Copied for Subcontract",
                     "The current job was copied but the copy was not saved. "
+                    + "Please enter or change the details for the copied job as required for the subcontract",
+                    FacesMessage.SEVERITY_INFO);
+        } else {
+            PrimeFacesUtils.addMessage("Subcontract NOT Created",
+                    "The subcontract was not created. Contact your System Administrator",
+                    FacesMessage.SEVERITY_ERROR);
+        }
+    }
+
+    public void subContractJobWithCosting(ActionEvent actionEvent) {
+        EntityManager em = getEntityManager1();
+
+        if (currentJob.getId() == null || currentJob.getIsDirty()) {
+            PrimeFacesUtils.addMessage("Subcontract NOT Created",
+                    "This job must be saved before it can be subcontracted",
+                    FacesMessage.SEVERITY_ERROR);
+            return;
+        } else if (currentJob.getIsSubContract()) {
+            PrimeFacesUtils.addMessage("Subcontract NOT Created",
+                    "A subcontract cannot be subcontracted",
+                    FacesMessage.SEVERITY_ERROR);
+            return;
+        }
+
+        if (createJob(em, true, true)) {
+            PrimeFacesUtils.addMessage("Job and Costing Copied for Subcontract",
+                    "The current job and its costing was copied but the copy was not saved. "
                     + "Please enter or change the details for the copied job as required for the subcontract",
                     FacesMessage.SEVERITY_INFO);
         } else {
@@ -1720,7 +1752,7 @@ public class JobManager implements
     public Boolean getIsDirty() {
         return getIsJobDirty(getCurrentJob());
     }
-    
+
     public void setIsJobDirty(Job job, Boolean dirty) {
         job.setIsDirty(dirty);
         if (dirty) {
