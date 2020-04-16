@@ -120,6 +120,11 @@ public class JobManager implements
     public JobManager() {
         init();
     }
+    
+    public String getAppShortcutIconURL() {
+        return (String) SystemOption.getOptionValueObject(
+                    getEntityManager1(), "appShortcutIconURL");
+    }
 
     public void onJobCellEdit(CellEditEvent event) {
 
