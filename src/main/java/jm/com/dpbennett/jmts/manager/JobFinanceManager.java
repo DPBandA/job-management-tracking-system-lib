@@ -2776,8 +2776,10 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                     PrimeFacesUtils.addMessage("Job Costing and Job Saved", "This job and the costing were saved", FacesMessage.SEVERITY_INFO);
                 } else {
                     PrimeFacesUtils.addMessage("Job Costing and Job NOT Saved", "This job and the costing were NOT saved", FacesMessage.SEVERITY_ERROR);
-                }
+                }  
             }
+            
+            getJobManager().doJobSearch(15);
         }
     }
 

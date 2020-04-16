@@ -510,9 +510,8 @@ public class JobManager implements
             PrimeFaces.current().ajax().update("headerForm:growl3");
             currentJob.setIsDirty(false);
         }
-        else {
-            doJobSearch(15);
-        }
+                
+        doJobSearch(15);
 
     }
 
@@ -1745,6 +1744,8 @@ public class JobManager implements
     }
 
     public void setEditJobCosting(Job currentJob) {
+        
+        currentJob = Job.findJobById(getEntityManager1(), currentJob.getId());
         this.currentJob = currentJob;
         this.currentJob.setVisited(true);
 
@@ -1755,7 +1756,7 @@ public class JobManager implements
                 = JobCostingAndPayment.findJobCostingAndPaymentById(em,
                         getCurrentJob().getJobCostingAndPayment().getId());
 
-        em.refresh(jcp);
+        //em.refresh(jcp);
 
         currentJob.getJobCostingAndPayment().setCashPayments(jcp.getCashPayments());
 
