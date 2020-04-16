@@ -510,6 +510,9 @@ public class JobManager implements
             PrimeFaces.current().ajax().update("headerForm:growl3");
             currentJob.setIsDirty(false);
         }
+        else {
+            doJobSearch(15);
+        }
 
     }
 
@@ -1469,11 +1472,6 @@ public class JobManager implements
         }
     }
 
-    public void editJob() {
-        getCurrentJob().getJobStatusAndTracking().setEditStatus("        ");
-        PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, 600, 975);
-    }
-
     public void editJobCostingAndPayment() {
         PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, 600, 975);
     }
@@ -1574,13 +1572,14 @@ public class JobManager implements
         }
     }
 
-    public List<Job> findJobs(Boolean includeSampleSearch) {
+    public List<Job> findJobs(Boolean includeSampleSearch, Integer maxResults) {
         return Job.findJobsByDateSearchField(getEntityManager1(),
                 getUser(),
                 getDateSearchPeriod(),
                 getSearchType(),
                 getSearchText(),
-                includeSampleSearch);
+                includeSampleSearch,
+                maxResults);
     }
 
     public void doDefaultSearch() {
@@ -1624,7 +1623,7 @@ public class JobManager implements
 //        }
     }
 
-    public void doPurchaseReqSearch() {
+    public void doPurchaseReqSearch() { // tk delete if not used
 //        getPurchasingManager().doPurchaseReqSearch(
 //                getPurchasingManager().getDateSearchPeriod(),
 //                getPurchasingManager().getSearchType(),
@@ -1637,10 +1636,25 @@ public class JobManager implements
     public void doJobSearch() {
 
         if (getUser().getId() != null) {
-            jobSearchResultList = findJobs(false);
+            jobSearchResultList = findJobs(false, 0);
 
             if (jobSearchResultList.isEmpty()) {
-                jobSearchResultList = findJobs(true);
+                jobSearchResultList = findJobs(true, 0);
+            }
+
+        } else {
+            jobSearchResultList = new ArrayList<>();
+        }
+
+    }
+    
+    public void doJobSearch(Integer maxResults) {
+
+        if (getUser().getId() != null) {
+            jobSearchResultList = findJobs(false, maxResults);
+
+            if (jobSearchResultList.isEmpty()) {
+                jobSearchResultList = findJobs(true, maxResults);
             }
 
         } else {
@@ -1715,11 +1729,18 @@ public class JobManager implements
     public void setCurrentJob(Job currentJob) {
         this.currentJob = currentJob;
     }
+    
+    public void editJob() {     
+        
+        PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, 600, 975);
+    }
 
     public void setEditCurrentJob(Job currentJob) {
-
+        
+        currentJob = Job.findJobById(getEntityManager1(), currentJob.getId());
         this.currentJob = currentJob;
         this.currentJob.setVisited(true);
+        this.currentJob.getJobStatusAndTracking().setEditStatus("        ");
         getJobFinanceManager().setEnableOnlyPaymentEditing(false);
     }
 
