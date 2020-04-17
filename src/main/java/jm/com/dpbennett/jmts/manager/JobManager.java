@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedProperty;
@@ -510,8 +511,6 @@ public class JobManager implements
             PrimeFaces.current().ajax().update("headerForm:growl3");
             currentJob.setIsDirty(false);
         }
-                
-        doJobSearch(15);
 
     }
 
@@ -731,7 +730,7 @@ public class JobManager implements
         if (checkUserJobEntryPrivilege()) {
             createJob(em, false, false);
             getJobFinanceManager().setEnableOnlyPaymentEditing(false);
-            PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, 600, 975);
+            editJob();
             openJobBrowser();
         } else {
             PrimeFacesUtils.addMessage("Job NOT Created",
@@ -1472,7 +1471,7 @@ public class JobManager implements
     }
 
     public void editJobCostingAndPayment() {
-        PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, 600, 975);
+        editJob();
     }
 
     public String getJobAssignee() {
@@ -1731,40 +1730,47 @@ public class JobManager implements
     
     public void editJob() {     
         
-        PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, 600, 975);
+        PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
+    }
+    
+    /**
+     * Finds and returns the current job that is saved in the database. It also
+     * updates 'jobSearchResultList' with the saved job.
+     * @param currentJob
+     * @return 
+     */
+    private Job getSavedCurrentJob(Job currentJob) {
+        int i = 0;
+        Job foundJob = Job.findJobById(getEntityManager1(), currentJob.getId());
+        for (Job job : jobSearchResultList) {
+            if (Objects.equals(job.getId(), foundJob.getId())) {
+                jobSearchResultList.set(i, foundJob);
+                break;
+            }
+            ++i;
+        }
+        
+        return foundJob;
     }
 
     public void setEditCurrentJob(Job currentJob) {
         
-        currentJob = Job.findJobById(getEntityManager1(), currentJob.getId());
-        this.currentJob = currentJob;
+        this.currentJob = getSavedCurrentJob(currentJob);
         this.currentJob.setVisited(true);
         this.currentJob.getJobStatusAndTracking().setEditStatus("        ");
         getJobFinanceManager().setEnableOnlyPaymentEditing(false);
     }
 
     public void setEditJobCosting(Job currentJob) {
-        
-        currentJob = Job.findJobById(getEntityManager1(), currentJob.getId());
-        this.currentJob = currentJob;
+       
+        this.currentJob = getSavedCurrentJob(currentJob);;
         this.currentJob.setVisited(true);
-
-        // Reload cash payments if possible to avoid overwriting them 
-        // when saving
-        EntityManager em = getEntityManager1();
-        JobCostingAndPayment jcp
-                = JobCostingAndPayment.findJobCostingAndPaymentById(em,
-                        getCurrentJob().getJobCostingAndPayment().getId());
-
-        //em.refresh(jcp);
-
-        currentJob.getJobCostingAndPayment().setCashPayments(jcp.getCashPayments());
 
         setSelectedJobs(new Job[]{});
     }
 
     public void setEditJobCostingAndPayment(Job currentJob) {
-        this.currentJob = currentJob;
+        this.currentJob = getSavedCurrentJob(currentJob);
         this.currentJob.setVisited(true);
 
         getJobFinanceManager().setEnableOnlyPaymentEditing(true);

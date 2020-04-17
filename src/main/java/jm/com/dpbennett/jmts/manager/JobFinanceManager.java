@@ -2779,7 +2779,6 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                 }  
             }
             
-            getJobManager().doJobSearch(15);
         }
     }
 
