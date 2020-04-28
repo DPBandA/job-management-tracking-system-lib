@@ -121,10 +121,76 @@ public class JobManager implements
     public JobManager() {
         init();
     }
-    
+
+    /**
+     * Determines if a job dialog field is to be disabled.
+     *
+     * @param field
+     * @return
+     */
+    public Boolean disableJobDialogField(String field) {
+
+        Boolean fieldDisablingActive
+                = (Boolean) SystemOption.getOptionValueObject(getEntityManager1(),
+                        "activateJobDialogFieldDisabling");
+
+        switch (field) {
+            case "businessOffice":
+            case "client":
+            case "clientActionsMenu":
+            case "billingAddress":
+            case "clientContact":
+            case "dateSubmitted":
+            case "subContractedDepartment":
+            case "estimatedTAT":
+            case "tatRequired":
+            case "instructions":
+            case "service":
+            case "otherService":
+                return fieldDisablingActive
+                        && !getUser().getPrivilege().getCanEditDisabledJobField()
+                        && getCurrentJob().getId() != null;  
+            case "department":
+                return (fieldDisablingActive
+                        && !getUser().getPrivilege().getCanEditDisabledJobField()
+                        && (getCurrentJob().getId() != null)) || getDisableDepartment();
+            default:
+                return false;
+        }
+
+    }
+
+    public Boolean getDisableDepartment() {
+
+        return getRenderSubContractingDepartment();
+    }
+
+    public Boolean getRenderSubContractingDepartment() {
+        return getCurrentJob().getIsToBeSubcontracted() || getCurrentJob().getIsSubContract();
+    }
+
+    /**
+     * Conditionally disable department entry. Currently not used.
+     *
+     * @return
+     */
+    public Boolean getDisableDepartmentEntry() {
+
+        // allow department entry only if business office is null
+        if (currentJob != null) {
+            if (currentJob.getBusinessOffice() != null) {
+                return !currentJob.getBusinessOffice().getCode().trim().equals("");
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public String getAppShortcutIconURL() {
         return (String) SystemOption.getOptionValueObject(
-                    getEntityManager1(), "appShortcutIconURL");
+                getEntityManager1(), "appShortcutIconURL");
     }
 
     public void onJobCellEdit(CellEditEvent event) {
@@ -766,25 +832,6 @@ public class JobManager implements
         List<Preference> prefs = Preference.findAllPreferencesByName(em, "jobTableView");
 
         return prefs;
-    }
-
-    /**
-     * Conditionally disable department entry. Currently not used.
-     *
-     * @return
-     */
-    public Boolean getDisableDepartmentEntry() {
-
-        // allow department entry only if business office is null
-        if (currentJob != null) {
-            if (currentJob.getBusinessOffice() != null) {
-                return !currentJob.getBusinessOffice().getCode().trim().equals("");
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
     }
 
     public void setJobCompletionDate(Date date) {
@@ -1645,7 +1692,7 @@ public class JobManager implements
         }
 
     }
-    
+
     public void doJobSearch(Integer maxResults) {
 
         if (getUser().getId() != null) {
@@ -1727,17 +1774,18 @@ public class JobManager implements
     public void setCurrentJob(Job currentJob) {
         this.currentJob = currentJob;
     }
-    
-    public void editJob() {     
-        
+
+    public void editJob() {
+
         PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
     }
-    
+
     /**
      * Finds and returns the current job that is saved in the database. It also
      * updates 'jobSearchResultList' with the saved job.
+     *
      * @param currentJob
-     * @return 
+     * @return
      */
     private Job getSavedCurrentJob(Job currentJob) {
         int i = 0;
@@ -1749,12 +1797,12 @@ public class JobManager implements
             }
             ++i;
         }
-        
+
         return foundJob;
     }
 
     public void setEditCurrentJob(Job currentJob) {
-        
+
         this.currentJob = getSavedCurrentJob(currentJob);
         this.currentJob.setVisited(true);
         this.currentJob.getJobStatusAndTracking().setEditStatus("        ");
@@ -1762,7 +1810,7 @@ public class JobManager implements
     }
 
     public void setEditJobCosting(Job currentJob) {
-       
+
         this.currentJob = getSavedCurrentJob(currentJob);;
         this.currentJob.setVisited(true);
 
@@ -2078,15 +2126,6 @@ public class JobManager implements
 
     public JobDataModel getJobsModel() {
         return new JobDataModel(jobSearchResultList);
-    }
-
-    public Boolean getDisableDepartment() {
-        //return getCurrentJob().getIsToBeSubcontracted() || getCurrentJob().getIsSubContract();
-        return getRenderSubContractingDepartment();
-    }
-
-    public Boolean getRenderSubContractingDepartment() {
-        return getCurrentJob().getIsToBeSubcontracted() || getCurrentJob().getIsSubContract();
     }
 
     /**
