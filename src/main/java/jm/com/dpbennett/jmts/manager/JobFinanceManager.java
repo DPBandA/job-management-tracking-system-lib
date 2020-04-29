@@ -3172,6 +3172,11 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         return JobCostingAndPayment.getCanApplyTax(getCurrentJob())
                 && getCanEditJobCosting();
     }
+    
+    public Boolean getCanApplyDiscount() {
+
+        return getUser().getEmployee().getDepartment().getPrivilege().getCanEditInvoicingAndPayment();
+    }
 
     public Boolean getCanApproveJobCosting() {
         return ((isUserDepartmentSupervisor(getCurrentJob())
