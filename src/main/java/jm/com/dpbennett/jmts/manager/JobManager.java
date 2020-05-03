@@ -133,7 +133,9 @@ public class JobManager implements
         Boolean fieldDisablingActive
                 = (Boolean) SystemOption.getOptionValueObject(getEntityManager1(),
                         "activateJobDialogFieldDisabling");
-        Boolean userHasPrivilege = getUser().getPrivilege().getCanEditDisabledJobField();
+        Boolean userHasPrivilege = getUser().getPrivilege().getCanEditDisabledJobField()
+                || getUser().getEmployee().getDepartment().getPrivilege().getCanEditDisabledJobField();
+        Boolean jobIsNotNew = getCurrentJob().getId() != null;
 
         switch (field) {
             case "businessOffice":
@@ -151,19 +153,19 @@ public class JobManager implements
             case "otherService":
                 return fieldDisablingActive
                         && !userHasPrivilege
-                        && getCurrentJob().getId() != null;
+                        && jobIsNotNew;
             case "department":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (getCurrentJob().getId() != null)) || getDisableDepartment();
+                        && (jobIsNotNew)) || getDisableDepartment();
             case "costingandpayment":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (getCurrentJob().getId() != null)) || getJobFinanceManager().getIsJobCompleted();    
+                        && (jobIsNotNew)) || getJobFinanceManager().getIsJobCompleted();    
             case "discount":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (getCurrentJob().getId() != null)) || !getJobFinanceManager().getCanApplyDiscount();    
+                        && (jobIsNotNew)) || !getJobFinanceManager().getCanApplyDiscount();    
             default:
                 return false;
         }
