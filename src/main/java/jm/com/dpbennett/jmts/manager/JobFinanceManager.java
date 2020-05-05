@@ -3894,11 +3894,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     public Boolean getIsMemberOfAccountsDept() {
-        return getUser().getEmployee().isMemberOf(getDepartmentBySystemOptionDeptId("accountsDepartmentId"));
+        return getUser().isMemberOf(
+                getEntityManager1(), getDepartmentBySystemOptionDeptId("accountsDepartmentId"));
     }
 
     public Boolean getIsMemberOfCustomerServiceDept() {
-        return getUser().getEmployee().isMemberOf(getDepartmentBySystemOptionDeptId("customerServiceDeptId"));
+        return getUser().isMemberOf(
+                getEntityManager1(), getDepartmentBySystemOptionDeptId("customerServiceDeptId"));
     }
 
     /**

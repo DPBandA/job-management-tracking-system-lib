@@ -161,11 +161,11 @@ public class JobManager implements
             case "costingandpayment":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (jobIsNotNew)) || getJobFinanceManager().getIsJobCompleted();    
+                        && (jobIsNotNew)) || getJobFinanceManager().getIsJobCompleted();
             case "discount":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (jobIsNotNew)) || !getJobFinanceManager().getCanApplyDiscount();    
+                        && (jobIsNotNew)) || !getJobFinanceManager().getCanApplyDiscount();
             default:
                 return false;
         }
@@ -1064,7 +1064,7 @@ public class JobManager implements
             }
 
             if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                    && !getUser().getPrivilege().getCanBeJMTSAdministrator()
+                    //&& !getUser().getPrivilege().getCanBeJMTSAdministrator()
                     && !getUser().isUserDepartmentSupervisor(job, em)) {
 
                 // Reset current job to its saved work progress
@@ -1077,8 +1077,7 @@ public class JobManager implements
 
                 return false;
             } else if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                    && (getUser().getPrivilege().getCanBeJMTSAdministrator()
-                    || getUser().isUserDepartmentSupervisor(job, em))) {
+                    && (/*getUser().getPrivilege().getCanBeJMTSAdministrator() || */getUser().isUserDepartmentSupervisor(job, em))) {
                 // System admin can change work status even if it's completed.
                 return true;
             } else if (!savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
@@ -1305,10 +1304,6 @@ public class JobManager implements
         doJobSearch();
     }
 
-//    public void saveAndCloseCurrentJob() {
-//        saveCurrentJob();
-//        PrimeFacesUtils.closeDialog(null);
-//    }
     private void prepareAndSaveJob(Job job) {
         ReturnMessage returnMessage;
 
@@ -1331,6 +1326,29 @@ public class JobManager implements
     }
 
     public void saveJob(Job job) {
+        EntityManager em = getEntityManager1();
+
+        // Do not save changed job if it's already marked as completed in the database
+        // However, saving is allowed if the user belongs to the "Invoicing department"
+        // or is a system administrator
+        if (!isJobNew(job)) {
+            Job savedJob = Job.findJobById(em, job.getId());
+            if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
+                    //&& !user.isMemberOf(em, Department.findDepartmentBySystemOptionDeptId("invoicingDepartmentId", em))
+                    //&& !user.getPrivilege().getCanBeJMTSAdministrator()
+                    && !User.isUserDepartmentSupervisor(savedJob, getUser(), em)) {
+
+                job.setIsDirty(false);
+
+                PrimeFacesUtils.addMessage(
+                        "Job Cannot Be Saved",
+                        "This job is marked as completed so changes cannot be saved. You may contact your department's supervisor or a system administrator",
+                        FacesMessage.SEVERITY_ERROR);
+
+                return;
+            }
+        }
+
         // Ensure that at least 1 service is selected
         if (job.getServices().isEmpty()) {
             PrimeFacesUtils.addMessage("Service(s) NOT Selected",
@@ -1352,46 +1370,60 @@ public class JobManager implements
         }
 
         // Do privelege checks and save if possible
-        if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()) {
+        // Check for job entry privileges
+        // NB: for getCanEnterOwnJob check that the job is assigned to the user.
+        if (isJobNew(job)                
+                && (getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob() // dept. can enter any job?
+                || (getUser().getPrivilege().getCanEnterDepartmentJob() && getUser().isMemberOf(em, job.getDepartment())) // belongs to dept. and can enter dept. jobs?
+                || (getUser().getPrivilege().getCanEnterOwnJob() && getUser().isMemberOf(em, job.getDepartment())) // belongs to the dept. and can enter own job?
+                || getUser().getPrivilege().getCanEnterJob())) { // user can enter any job?
             prepareAndSaveJob(job);
-        } else if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()) {
-            prepareAndSaveJob(job);
-        } else if (isJobNew(job) && getUser().getPrivilege().getCanEnterJob()) {
-            prepareAndSaveJob(job);
-        } else if (isJobNew(job)
-                && getUser().getPrivilege().getCanEnterDepartmentJob()
-                && getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(job, getEntityManager1()))) {
-            prepareAndSaveJob(job);
-        } else if (isJobNew(job)
-                && getUser().getPrivilege().getCanEnterOwnJob()
-                && isJobAssignedToUser(job)) {
-            prepareAndSaveJob(job);
-        } else if (getIsJobDirty(job) && !isJobNew(job) && getUser().getPrivilege().getCanEditJob()) {
-            prepareAndSaveJob(job);
-        } else if (getIsJobDirty(job) && !isJobNew(job)
-                && getUser().getPrivilege().getCanEditDepartmentJob()
-                && (getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(job, getEntityManager1()))
-                || getUser().getEmployee().isMemberOf(job.getDepartment()))) {
-            prepareAndSaveJob(job);
-        } else if (getIsJobDirty(job) && !isJobNew(job)
-                && getUser().getPrivilege().getCanEditOwnJob()
-                && isJobAssignedToUser(job)) {
-            prepareAndSaveJob(job);
-        } else if (job.getIsToBeCopied()) {
-            prepareAndSaveJob(job);
-        } else if (job.getIsToBeSubcontracted()) {
-            prepareAndSaveJob(job);
-        } else if (!getIsJobDirty(job)) {
-            PrimeFacesUtils.addMessage("Already Saved",
-                    "Job was not saved because it was not modified or it was recently saved.",
-                    FacesMessage.SEVERITY_INFO);
-        } else {
+        } else { // tk for now...need to check other privileges first.
             PrimeFacesUtils.addMessage("Insufficient Privilege",
-                    "You may not have the privilege to enter/save this job. \n"
-                    + "Please contact the IT/MIS Department for further assistance.",
+                    "You do not have the privilege to enter new jobs. \n"
+                    + "Please contact the System Administrator for further assistance.",
                     FacesMessage.SEVERITY_ERROR);
         }
 
+//        if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()) {
+//            prepareAndSaveJob(job);
+//        } else if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()) {
+//            prepareAndSaveJob(job);
+//        } else if (isJobNew(job) && getUser().getPrivilege().getCanEnterJob()) {
+//            prepareAndSaveJob(job);
+//        } else if (isJobNew(job)
+//                && getUser().getPrivilege().getCanEnterDepartmentJob()
+//                && getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(job, getEntityManager1()))) {
+//            prepareAndSaveJob(job);
+//        } else if (isJobNew(job)
+//                && getUser().getPrivilege().getCanEnterOwnJob()
+//                && isJobAssignedToUser(job)) {
+//            prepareAndSaveJob(job);
+//        } else if (getIsJobDirty(job) && !isJobNew(job) && getUser().getPrivilege().getCanEditJob()) {
+//            prepareAndSaveJob(job);
+//        } else if (getIsJobDirty(job) && !isJobNew(job)
+//                && getUser().getPrivilege().getCanEditDepartmentJob()
+//                && (getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(job, getEntityManager1()))
+//                || getUser().isMemberOf(em, job.getDepartment()))) {
+//            prepareAndSaveJob(job);
+//        } else if (getIsJobDirty(job) && !isJobNew(job)
+//                && getUser().getPrivilege().getCanEditOwnJob()
+//                && isJobAssignedToUser(job)) {
+//            prepareAndSaveJob(job);
+//        } else if (job.getIsToBeCopied()) {
+//            prepareAndSaveJob(job);
+//        } else if (job.getIsToBeSubcontracted()) {
+//            prepareAndSaveJob(job);
+//        } else if (!getIsJobDirty(job)) {
+//            PrimeFacesUtils.addMessage("Already Saved",
+//                    "Job was not saved because it was not modified or it was recently saved.",
+//                    FacesMessage.SEVERITY_INFO);
+//        } else {
+//            PrimeFacesUtils.addMessage("Insufficient Privilege",
+//                    "You may not have the privilege to enter/save this job. \n"
+//                    + "Please contact the IT/MIS Department for further assistance.",
+//                    FacesMessage.SEVERITY_ERROR);
+//        }
     }
 
     public void saveCurrentJob() {
@@ -2174,7 +2206,7 @@ public class JobManager implements
         // by a person assignment 
         try {
             // Do not sent job email if user is a member of the department to which the job was assigned
-            if (isCurrentJobNew() && !getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(currentJob, em))) {
+            if (isCurrentJobNew() && !getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(currentJob, em))) {
                 List<String> emails = Employee.getDepartmentSupervisorsEmailAddresses(Department.findDepartmentAssignedToJob(currentJob, em), em);
                 emails.add(Employee.findEmployeeDefaultEmailAdress(currentJob.getAssignedTo(), getEntityManager1()));
                 for (String email : emails) {
@@ -2188,7 +2220,7 @@ public class JobManager implements
                     }
                 }
 
-            } else if (getIsDirty() && !getUser().getEmployee().isMemberOf(Department.findDepartmentAssignedToJob(currentJob, em))) {
+            } else if (getIsDirty() && !getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(currentJob, em))) {
                 List<String> emails = Employee.getDepartmentSupervisorsEmailAddresses(Department.findDepartmentAssignedToJob(currentJob, em), em);
                 emails.add(Employee.findEmployeeDefaultEmailAdress(currentJob.getAssignedTo(), getEntityManager1()));
                 for (String email : emails) {
