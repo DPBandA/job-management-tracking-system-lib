@@ -805,17 +805,10 @@ public class JobManager implements
 
         EntityManager em = getEntityManager1();
 
-        //if (checkUserJobEntryPrivilege()) {
         createJob(em, false, false);
         getJobFinanceManager().setEnableOnlyPaymentEditing(false);
         editJob();
         openJobBrowser();
-        //} else {
-        //    PrimeFacesUtils.addMessage("Job NOT Created",
-        //            "You do not have the prvilege to create jobs. Please contact your System Administrator",
-        //            FacesMessage.SEVERITY_ERROR);
-        //}
-
     }
 
     public StreamedContent getServiceContractFile() {
@@ -1064,7 +1057,6 @@ public class JobManager implements
             }
 
             if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                    //&& !getUser().getPrivilege().getCanBeJMTSAdministrator()
                     && !getUser().isUserDepartmentSupervisor(job, em)) {
 
                 // Reset current job to its saved work progress
@@ -1072,12 +1064,12 @@ public class JobManager implements
                         setWorkProgress(savedJob.getJobStatusAndTracking().getWorkProgress());
 
                 PrimeFacesUtils.addMessage("Job Work Progress Cannot Be Changed",
-                        "\"This job is marked as completed and cannot be changed. You may contact the department's supervisor.",
+                        "\"This job is marked as completed and cannot be changed. You may contact your supervisor.",
                         FacesMessage.SEVERITY_WARN);
 
                 return false;
             } else if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                    && (/*getUser().getPrivilege().getCanBeJMTSAdministrator() || */getUser().isUserDepartmentSupervisor(job, em))) {
+                    && (getUser().isUserDepartmentSupervisor(job, em))) {
                 // System admin can change work status even if it's completed.
                 return true;
             } else if (!savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
@@ -1343,7 +1335,7 @@ public class JobManager implements
 
                 PrimeFacesUtils.addMessage(
                         "Job Cannot Be Saved",
-                        "This job is marked as completed so changes cannot be saved. You may contact your department's supervisor or a system administrator",
+                        "This job is marked as completed so changes cannot be saved. You may contact your supervisor or a system administrator",
                         FacesMessage.SEVERITY_ERROR);
 
                 return;
@@ -1386,14 +1378,10 @@ public class JobManager implements
 
             prepareAndSaveJob(job);
 
-            return;
-        }
-
-        // Check for job editing privileges
-        if (!isJobNew(job)) {
+        } else if (!isJobNew(job)) {
             savedJob = Job.findJobById(em, job.getId());
-            if (!isJobNew(job)
-                    && ( // Can the user's department edit any job?
+            // Check for job editing privileges
+            if ( // Can the user's department edit any job?
                     getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()
                     // Can the user edit a job for the department to which the job is assigned?
                     || (getUser().getPrivilege().getCanEditDepartmentJob() && getUser().isMemberOf(em, savedJob.getDepartment()))
@@ -1402,71 +1390,22 @@ public class JobManager implements
                     && Objects.equals(getUser().getEmployee().getId(), savedJob.getAssignedTo().getId())
                     && getUser().isMemberOf(em, savedJob.getDepartment()))
                     // Can the user edit any job?
-                    || getUser().getPrivilege().getCanEditJob())) {
+                    || getUser().getPrivilege().getCanEditJob()) {
 
                 prepareAndSaveJob(job);
-
-                return;
+            } else {
+                PrimeFacesUtils.addMessage("Insufficient Privilege",
+                        "You do not have the privilege to enter/edit jobs. \n"
+                        + "Please contact the System Administrator for assistance.",
+                        FacesMessage.SEVERITY_ERROR);
             }
-        }
-
-        // Display error message if the user does not have the privilege to enter/edit jobs.
-        PrimeFacesUtils.addMessage("Insufficient Privilege",
-                "You do not have the privilege to enter/edit jobs. \n"
-                + "Please contact the System Administrator for assistance.",
-                FacesMessage.SEVERITY_ERROR);
-
-//        if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()) {
-//            prepareAndSaveJob(job);
-//        } else if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()) {
-//            prepareAndSaveJob(job);
-//        } else if (isJobNew(job) && getUser().getPrivilege().getCanEnterJob()) {
-//            prepareAndSaveJob(job);
-//        } else if (isJobNew(job)
-//                && getUser().getPrivilege().getCanEnterDepartmentJob()
-//                && getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(job, getEntityManager1()))) {
-//            prepareAndSaveJob(job);
-//        } else if (isJobNew(job)
-//                && getUser().getPrivilege().getCanEnterOwnJob()
-//                && isJobAssignedToUser(job)) {
-//            prepareAndSaveJob(job);
-//        } else if (getIsJobDirty(job) && !isJobNew(job) && getUser().getPrivilege().getCanEditJob()) {
-//            prepareAndSaveJob(job);
-//        } else if (getIsJobDirty(job) && !isJobNew(job)
-//                && getUser().getPrivilege().getCanEditDepartmentJob()
-//                && (getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(job, getEntityManager1()))
-//                || getUser().isMemberOf(em, job.getDepartment()))) {
-//            prepareAndSaveJob(job);
-//        } else if (getIsJobDirty(job) && !isJobNew(job)
-//                && getUser().getPrivilege().getCanEditOwnJob()
-//                && isJobAssignedToUser(job)) {
-//            prepareAndSaveJob(job);
-//        } else if (job.getIsToBeCopied()) {
-//            prepareAndSaveJob(job);
-//        } else if (job.getIsToBeSubcontracted()) {
-//            prepareAndSaveJob(job);
-//        } else if (!getIsJobDirty(job)) {
-//            PrimeFacesUtils.addMessage("Already Saved",
-//                    "Job was not saved because it was not modified or it was recently saved.",
-//                    FacesMessage.SEVERITY_INFO);
-//        } else {
-//            PrimeFacesUtils.addMessage("Insufficient Privilege",
-//                    "You may not have the privilege to enter/save this job. \n"
-//                    + "Please contact the IT/MIS Department for further assistance.",
-//                    FacesMessage.SEVERITY_ERROR);
-//        }
+        } 
     }
 
     public void saveCurrentJob() {
         saveJob(getCurrentJob());
     }
 
-//    public Boolean checkUserJobEntryPrivilege() {
-//
-//        return getUser().getPrivilege().getCanEnterJob()
-//                || getUser().getPrivilege().getCanEnterDepartmentJob()
-//                || getUser().getPrivilege().getCanEnterOwnJob();
-//    }
     public Boolean getIsClientNameValid() {
         return BusinessEntityUtils.validateName(currentJob.getClient().getName());
     }
