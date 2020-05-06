@@ -805,16 +805,16 @@ public class JobManager implements
 
         EntityManager em = getEntityManager1();
 
-        if (checkUserJobEntryPrivilege()) {
-            createJob(em, false, false);
-            getJobFinanceManager().setEnableOnlyPaymentEditing(false);
-            editJob();
-            openJobBrowser();
-        } else {
-            PrimeFacesUtils.addMessage("Job NOT Created",
-                    "You do not have the prvilege to create jobs. Please contact your System Administrator",
-                    FacesMessage.SEVERITY_ERROR);
-        }
+        //if (checkUserJobEntryPrivilege()) {
+        createJob(em, false, false);
+        getJobFinanceManager().setEnableOnlyPaymentEditing(false);
+        editJob();
+        openJobBrowser();
+        //} else {
+        //    PrimeFacesUtils.addMessage("Job NOT Created",
+        //            "You do not have the prvilege to create jobs. Please contact your System Administrator",
+        //            FacesMessage.SEVERITY_ERROR);
+        //}
 
     }
 
@@ -1327,12 +1327,13 @@ public class JobManager implements
 
     public void saveJob(Job job) {
         EntityManager em = getEntityManager1();
+        Job savedJob;
 
         // Do not save changed job if it's already marked as completed in the database
         // However, saving is allowed if the user belongs to the "Invoicing department"
         // or is a system administrator
         if (!isJobNew(job)) {
-            Job savedJob = Job.findJobById(em, job.getId());
+            savedJob = Job.findJobById(em, job.getId());
             if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
                     //&& !user.isMemberOf(em, Department.findDepartmentBySystemOptionDeptId("invoicingDepartmentId", em))
                     //&& !user.getPrivilege().getCanBeJMTSAdministrator()
@@ -1371,19 +1372,49 @@ public class JobManager implements
 
         // Do privelege checks and save if possible
         // Check for job entry privileges
-        // NB: for getCanEnterOwnJob check that the job is assigned to the user.
-        if (isJobNew(job)                
-                && (getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob() // dept. can enter any job?
-                || (getUser().getPrivilege().getCanEnterDepartmentJob() && getUser().isMemberOf(em, job.getDepartment())) // belongs to dept. and can enter dept. jobs?
-                || (getUser().getPrivilege().getCanEnterOwnJob() && getUser().isMemberOf(em, job.getDepartment())) // belongs to the dept. and can enter own job?
-                || getUser().getPrivilege().getCanEnterJob())) { // user can enter any job?
+        if (isJobNew(job)
+                && ( // Can the user's department can enter any job?
+                getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()
+                // Can the user enter a job for the department to which the job is assigned?
+                || (getUser().getPrivilege().getCanEnterDepartmentJob() && getUser().isMemberOf(em, job.getDepartment()))
+                // Can the user assign a job to themself provided that the user belongs to the job's parent department?
+                || (getUser().getPrivilege().getCanEnterOwnJob()
+                && Objects.equals(getUser().getEmployee().getId(), job.getAssignedTo().getId())
+                && getUser().isMemberOf(em, job.getDepartment()))
+                // Can the user enter any job?
+                || getUser().getPrivilege().getCanEnterJob())) {
+
             prepareAndSaveJob(job);
-        } else { // tk for now...need to check other privileges first.
-            PrimeFacesUtils.addMessage("Insufficient Privilege",
-                    "You do not have the privilege to enter new jobs. \n"
-                    + "Please contact the System Administrator for further assistance.",
-                    FacesMessage.SEVERITY_ERROR);
+
+            return;
         }
+
+        // Check for job editing privileges
+        if (!isJobNew(job)) {
+            savedJob = Job.findJobById(em, job.getId());
+            if (!isJobNew(job)
+                    && ( // Can the user's department edit any job?
+                    getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()
+                    // Can the user edit a job for the department to which the job is assigned?
+                    || (getUser().getPrivilege().getCanEditDepartmentJob() && getUser().isMemberOf(em, savedJob.getDepartment()))
+                    // Can the user assign a job to themself provided that the user belongs to the job's parent department?
+                    || (getUser().getPrivilege().getCanEditOwnJob()
+                    && Objects.equals(getUser().getEmployee().getId(), savedJob.getAssignedTo().getId())
+                    && getUser().isMemberOf(em, savedJob.getDepartment()))
+                    // Can the user edit any job?
+                    || getUser().getPrivilege().getCanEditJob())) {
+
+                prepareAndSaveJob(job);
+
+                return;
+            }
+        }
+
+        // Display error message if the user does not have the privilege to enter/edit jobs.
+        PrimeFacesUtils.addMessage("Insufficient Privilege",
+                "You do not have the privilege to enter/edit jobs. \n"
+                + "Please contact the System Administrator for assistance.",
+                FacesMessage.SEVERITY_ERROR);
 
 //        if (isJobNew(job) && getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()) {
 //            prepareAndSaveJob(job);
@@ -1430,13 +1461,12 @@ public class JobManager implements
         saveJob(getCurrentJob());
     }
 
-    public Boolean checkUserJobEntryPrivilege() {
-
-        return getUser().getPrivilege().getCanEnterJob()
-                || getUser().getPrivilege().getCanEnterDepartmentJob()
-                || getUser().getPrivilege().getCanEnterOwnJob();
-    }
-
+//    public Boolean checkUserJobEntryPrivilege() {
+//
+//        return getUser().getPrivilege().getCanEnterJob()
+//                || getUser().getPrivilege().getCanEnterDepartmentJob()
+//                || getUser().getPrivilege().getCanEnterOwnJob();
+//    }
     public Boolean getIsClientNameValid() {
         return BusinessEntityUtils.validateName(currentJob.getClient().getName());
     }
