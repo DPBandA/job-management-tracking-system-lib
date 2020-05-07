@@ -2170,7 +2170,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             return false;
 
         }
-        // Check for a valid cleint Id
+        // Check for a valid client Id
         if (job.getClient().getFinancialAccount().getIdCust().isEmpty()) {
 
             PrimeFacesUtils.addMessage("Client Identification required",
@@ -2674,9 +2674,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
             return false;
 
-        } else if (isUserDepartmentSupervisor(job)
-                || (isJobAssignedToUserDepartment(job)
-                && getUser().getPrivilege().getCanApproveJobCosting())) {
+        } else if (getCanApproveJobCosting(job)) {
 
             return true;
 
@@ -3179,10 +3177,17 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     public Boolean getCanApproveJobCosting() {
-        return ((isUserDepartmentSupervisor(getCurrentJob())
-                || (isJobAssignedToUserDepartment(getCurrentJob())
+                
+        return getCanApproveJobCosting(getCurrentJob());
+    }
+    
+     public Boolean getCanApproveJobCosting(Job job) {
+        EntityManager em = getEntityManager1();
+        
+        return ((isUserDepartmentSupervisor(job)
+                || (getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(job, em))
                 && getUser().getPrivilege().getCanApproveJobCosting()))
-                && !getCurrentJob().getJobCostingAndPayment().getInvoiced());
+                && !job.getJobCostingAndPayment().getInvoiced());
     }
 
     public void openJobCostingDialog() {
