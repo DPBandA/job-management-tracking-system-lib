@@ -1630,13 +1630,13 @@ public class JobManager implements
         }
     }
 
-    public List<Job> findJobs(Boolean includeSampleSearch, Integer maxResults) {
+    public List<Job> findJobs(/*Boolean includeSampleSearch, */Integer maxResults) {
         return Job.findJobsByDateSearchField(getEntityManager1(),
                 getUser(),
                 getDateSearchPeriod(),
                 getSearchType(),
                 getSearchText(),
-                includeSampleSearch,
+                /*includeSampleSearch,*/
                 maxResults);
     }
 
@@ -1694,11 +1694,11 @@ public class JobManager implements
     public void doJobSearch() {
 
         if (getUser().getId() != null) {
-            jobSearchResultList = findJobs(false, 0);
-
-            if (jobSearchResultList.isEmpty()) {
-                jobSearchResultList = findJobs(true, 0);
-            }
+            jobSearchResultList = findJobs(/*false, */0);
+//
+//            if (jobSearchResultList.isEmpty()) {
+//                jobSearchResultList = findJobs(true, 0);
+//            }
 
         } else {
             jobSearchResultList = new ArrayList<>();
@@ -1709,11 +1709,11 @@ public class JobManager implements
     public void doJobSearch(Integer maxResults) {
 
         if (getUser().getId() != null) {
-            jobSearchResultList = findJobs(false, maxResults);
+            jobSearchResultList = findJobs(/*false, */maxResults);
 
-            if (jobSearchResultList.isEmpty()) {
-                jobSearchResultList = findJobs(true, maxResults);
-            }
+//            if (jobSearchResultList.isEmpty()) {
+//                jobSearchResultList = findJobs(true, maxResults);
+//            }
 
         } else {
             jobSearchResultList = new ArrayList<>();
