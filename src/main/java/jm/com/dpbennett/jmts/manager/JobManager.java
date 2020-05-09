@@ -1400,6 +1400,12 @@ public class JobManager implements
                         FacesMessage.SEVERITY_ERROR);
             }
         } 
+        else {
+            PrimeFacesUtils.addMessage("Insufficient Privilege",
+                        "You do not have the privilege to enter/edit jobs. \n"
+                        + "Please contact the System Administrator for assistance.",
+                        FacesMessage.SEVERITY_ERROR);
+        }
     }
 
     public void saveCurrentJob() {
