@@ -567,6 +567,8 @@ public class JobManager implements
                 SelectItem item = (SelectItem) obj;
                 if (!item.getLabel().equals("General")
                         && !item.getLabel().equals("Unapproved job costings")
+                        && !item.getLabel().equals("Parent jobs only")
+                        && !item.getLabel().equals("Appr'd & uninv'd jobs")
                         && !item.getLabel().equals("Incomplete jobs")) {
                     newList.add(item);
                 }
