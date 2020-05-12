@@ -115,6 +115,7 @@ public class JobManager implements
     private String searchText;
     private Job[] selectedJobs;
     private AccPacCustomer accPacCustomer;
+    private StatusNote selectedStatusNote;
 
     /**
      * Creates a new instance of JobManager
@@ -122,21 +123,50 @@ public class JobManager implements
     public JobManager() {
         init();
     }
-    
-    public void createNewStatusNote() {
-        System.out.println("Creating new status note..."); // tk
+
+    public void editStatusNote() {
+        PrimeFacesUtils.openDialog(null, "statusNoteDialog", true, true, true, 300, 575);
     }
-    
+
+    public StatusNote getSelectedStatusNote() {
+        return selectedStatusNote;
+    }
+
+    public void setSelectedStatusNote(StatusNote selectedStatusNote) {
+        this.selectedStatusNote = selectedStatusNote;
+    }
+
+    public void okStatusNote() {
+        selectedStatusNote.save(getEntityManager1());
+
+        PrimeFaces.current().dialog().closeDynamic(null);
+    }
+
+    public void cancelStatusNote() {
+
+        PrimeFaces.current().dialog().closeDynamic(null);
+    }
+
+    public void createNewStatusNote() {
+        
+        selectedStatusNote = new StatusNote();
+        
+        selectedStatusNote.setEntityId(getCurrentJob().getId());
+        selectedStatusNote.setCreatedBy(getUser().getEmployee());
+        selectedStatusNote.setDateCreated(new Date());
+                
+        editStatusNote();
+    }
+
     public void statusNoteDialogReturn() {
-        System.out.println("Status note dialog return..."); //tk
     }
 
     public List<StatusNote> getStatusNotes() {
         if (getCurrentJob().getId() != null) {
-            return StatusNote.findActiveStatusNotesByEntityId(getEntityManager1(), 
+            return StatusNote.findActiveStatusNotesByEntityId(getEntityManager1(),
                     getCurrentJob().getId());
         }
-        
+
         return new ArrayList<>();
     }
 

@@ -229,8 +229,8 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
                 getSelectedJobSample().setIsDirty(true);
             }
         }
-    }
-
+    }    
+   
     public void okJobSample() {
         EntityManager em = getEntityManager1();
         updateSampleReference();
