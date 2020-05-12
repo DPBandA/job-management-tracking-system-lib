@@ -23,6 +23,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import jm.com.dpbennett.business.entity.StatusNote;
 import jm.com.dpbennett.business.entity.hrm.Department;
 import jm.com.dpbennett.hrm.manager.HumanResourceManager;
 import org.junit.Test;
@@ -31,33 +32,26 @@ import org.junit.Test;
  *
  * @author Desmond Bennett
  */
-public class HumanResourceManagerTest {
+public class EntityTest {
 
-    
     @Test
-    public void getDepartmentFullCode() {
+    public void creatEntity() {
         HashMap prop = new HashMap();
 
         prop.put("javax.persistence.jdbc.user",
                 "root");
         prop.put("javax.persistence.jdbc.password",
-                ""); // TK REMOVE PWD WHEN DONE
+                ""); // REMOVE PWD WHEN DONE AND SET SKIP TEST TRUE
         prop.put("javax.persistence.jdbc.url",
-                "jdbc:mysql://localhost:3306/jmts");
+                "jdbc:mysql://172.16.0.10:3306/jmtstest");
         prop.put("javax.persistence.jdbc.driver",
                 "com.mysql.jdbc.Driver");
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU", prop);
         EntityManager em = emf.createEntityManager();
 
-        Department d = Department.findDepartmentById(em, 20L);
-        if (d != null) {
-            System.out.println("Dept full code: " + HumanResourceManager.getDepartmentFullCode(em, d));
-        }
-        else {
-            System.out.println("Department not found.");
-        }
+        StatusNote s = new StatusNote();
 
     }
-    
+
 }

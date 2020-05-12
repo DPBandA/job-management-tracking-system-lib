@@ -44,6 +44,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceUnit;
+import jm.com.dpbennett.business.entity.StatusNote;
 import jm.com.dpbennett.business.entity.fm.Classification;
 import jm.com.dpbennett.business.entity.cm.Client;
 import jm.com.dpbennett.business.entity.hrm.Contact;
@@ -120,6 +121,28 @@ public class JobManager implements
      */
     public JobManager() {
         init();
+    }
+    
+    public void createNewStatusNote() {
+        System.out.println("Creating new status note..."); // tk
+    }
+    
+    public void statusNoteDialogReturn() {
+        System.out.println("Status note dialog return..."); //tk
+    }
+
+    public List<StatusNote> getStatusNotes() {
+        if (getCurrentJob().getId() != null) {
+            return StatusNote.findActiveStatusNotesByEntityId(getEntityManager1(), 
+                    getCurrentJob().getId());
+        }
+        
+        return new ArrayList<>();
+    }
+
+    public Boolean enableMultipleStatusNotes() {
+        return (Boolean) SystemOption.getOptionValueObject(getEntityManager1(),
+                "enableMultipleStatusNotes");
     }
 
     /**
@@ -1401,12 +1424,11 @@ public class JobManager implements
                         + "Please contact the System Administrator for assistance.",
                         FacesMessage.SEVERITY_ERROR);
             }
-        } 
-        else {
+        } else {
             PrimeFacesUtils.addMessage("Insufficient Privilege",
-                        "You do not have the privilege to enter/edit jobs. \n"
-                        + "Please contact the System Administrator for assistance.",
-                        FacesMessage.SEVERITY_ERROR);
+                    "You do not have the privilege to enter/edit jobs. \n"
+                    + "Please contact the System Administrator for assistance.",
+                    FacesMessage.SEVERITY_ERROR);
         }
     }
 
@@ -1722,7 +1744,6 @@ public class JobManager implements
 //            if (jobSearchResultList.isEmpty()) {
 //                jobSearchResultList = findJobs(true, maxResults);
 //            }
-
         } else {
             jobSearchResultList = new ArrayList<>();
         }
