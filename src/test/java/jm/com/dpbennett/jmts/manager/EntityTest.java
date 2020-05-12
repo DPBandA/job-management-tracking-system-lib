@@ -24,8 +24,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import jm.com.dpbennett.business.entity.StatusNote;
-import jm.com.dpbennett.business.entity.hrm.Department;
-import jm.com.dpbennett.hrm.manager.HumanResourceManager;
 import org.junit.Test;
 
 /**
@@ -39,11 +37,11 @@ public class EntityTest {
         HashMap prop = new HashMap();
 
         prop.put("javax.persistence.jdbc.user",
-                "root");
+                "");
         prop.put("javax.persistence.jdbc.password",
                 ""); // REMOVE PWD WHEN DONE AND SET SKIP TEST TRUE
         prop.put("javax.persistence.jdbc.url",
-                "jdbc:mysql://172.16.0.10:3306/jmtstest");
+                "jdbc:mysql://172.16.0.39:3306/jmts");
         prop.put("javax.persistence.jdbc.driver",
                 "com.mysql.jdbc.Driver");
 
