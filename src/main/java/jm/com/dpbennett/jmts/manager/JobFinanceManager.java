@@ -3165,15 +3165,24 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         setJobCostingAndPaymentDirty(true);
     }
 
+    /**
+     * This determine if taxes can be applied to the current job.
+     * @return 
+     */
     public Boolean getCanApplyTax() {
 
         return JobCostingAndPayment.getCanApplyTax(getCurrentJob())
                 && getCanEditJobCosting();
     }
     
+    /**
+     * This determines if the user's main department can apply discounts to
+     * a job costing.
+     * @return 
+     */
     public Boolean getCanApplyDiscount() {
 
-        return getUser().getEmployee().getDepartment().getPrivilege().getCanEditInvoicingAndPayment();
+        return getUser().getEmployee().getDepartment().getPrivilege().getCanApplyDiscountsToJobCosting();
     }
 
     public Boolean getCanApproveJobCosting() {

@@ -148,13 +148,14 @@ public class JobManager implements
     }
 
     public void createNewStatusNote() {
-        
+
         selectedStatusNote = new StatusNote();
-        
+
         selectedStatusNote.setEntityId(getCurrentJob().getId());
         selectedStatusNote.setCreatedBy(getUser().getEmployee());
         selectedStatusNote.setDateCreated(new Date());
-                
+        selectedStatusNote.setHeader("Enter a status note below:");
+
         editStatusNote();
     }
 
@@ -219,6 +220,10 @@ public class JobManager implements
                 return (fieldDisablingActive
                         && !userHasPrivilege
                         && (jobIsNotNew)) || !getJobFinanceManager().getCanApplyDiscount();
+            case "tax":
+                return (fieldDisablingActive
+                        && !userHasPrivilege
+                        && (jobIsNotNew)) || !getJobFinanceManager().getCanApplyTax();
             default:
                 return false;
         }
