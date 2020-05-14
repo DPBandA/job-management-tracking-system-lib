@@ -163,12 +163,20 @@ public class JobManager implements
     }
 
     public List<StatusNote> getStatusNotes() {
+        List<StatusNote> notes = new ArrayList<>();
+
         if (getCurrentJob().getId() != null) {
-            return StatusNote.findActiveStatusNotesByEntityId(getEntityManager1(),
+            notes = StatusNote.findActiveStatusNotesByEntityId(getEntityManager1(),
                     getCurrentJob().getId());
         }
 
-        return new ArrayList<>();
+        if (!getCurrentJob().getJobStatusAndTracking().getStatusNote().isEmpty()) {
+            notes.add(new StatusNote(getCurrentJob().getJobStatusAndTracking().getStatusNote(),
+                    null,
+                    null));
+        }
+
+        return notes;
     }
 
     public Boolean enableMultipleStatusNotes() {
