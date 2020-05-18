@@ -1436,11 +1436,12 @@ public class JobManager implements
                 && ( // Can the user's department can enter any job?
                 getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()
                 // Can the user enter a job for the department to which the job is assigned?
-                || (getUser().getPrivilege().getCanEnterDepartmentJob() && getUser().isMemberOf(em, job.getDepartment()))
+                || (getUser().getPrivilege().getCanEnterDepartmentJob()
+                && (getUser().isMemberOf(em, job.getDepartment()) || getUser().isMemberOf(em, job.getSubContractedDepartment())))
                 // Can the user assign a job to themself provided that the user belongs to the job's parent department?
                 || (getUser().getPrivilege().getCanEnterOwnJob()
                 && Objects.equals(getUser().getEmployee().getId(), job.getAssignedTo().getId())
-                && getUser().isMemberOf(em, job.getDepartment()))
+                && (getUser().isMemberOf(em, job.getDepartment()) || getUser().isMemberOf(em, job.getSubContractedDepartment()) ))
                 // Can the user enter any job?
                 || getUser().getPrivilege().getCanEnterJob())) {
 
@@ -1452,11 +1453,12 @@ public class JobManager implements
             if ( // Can the user's department edit any job?
                     getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()
                     // Can the user edit a job for the department to which the job is assigned?
-                    || (getUser().getPrivilege().getCanEditDepartmentJob() && getUser().isMemberOf(em, savedJob.getDepartment()))
+                    || (getUser().getPrivilege().getCanEditDepartmentJob() 
+                    && (getUser().isMemberOf(em, savedJob.getDepartment()) || getUser().isMemberOf(em, savedJob.getSubContractedDepartment())))
                     // Can the user assign a job to themself provided that the user belongs to the job's parent department?
                     || (getUser().getPrivilege().getCanEditOwnJob()
                     && Objects.equals(getUser().getEmployee().getId(), savedJob.getAssignedTo().getId())
-                    && getUser().isMemberOf(em, savedJob.getDepartment()))
+                    && (getUser().isMemberOf(em, savedJob.getDepartment()) || getUser().isMemberOf(em, savedJob.getSubContractedDepartment())))
                     // Can the user edit any job?
                     || getUser().getPrivilege().getCanEditJob()) {
 
