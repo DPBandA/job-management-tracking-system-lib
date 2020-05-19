@@ -52,7 +52,7 @@ import jm.com.dpbennett.business.entity.rm.DatePeriod;
 import jm.com.dpbennett.business.entity.hrm.Department;
 import jm.com.dpbennett.business.entity.hrm.Employee;
 import jm.com.dpbennett.business.entity.fm.JobCategory;
-import jm.com.dpbennett.business.entity.fm.JobCostingAndPayment;
+import jm.com.dpbennett.business.entity.jmts.JobCostingAndPayment;
 import jm.com.dpbennett.business.entity.hrm.User;
 import jm.com.dpbennett.business.entity.fm.JobSubCategory;
 import jm.com.dpbennett.business.entity.sm.Preference;
@@ -1436,11 +1436,11 @@ public class JobManager implements
                 && ( // Can the user's department can enter any job?
                 getUser().getEmployee().getDepartment().getPrivilege().getCanEnterJob()
                 // Can the user enter a job for the department to which the job is assigned?
-                || (getUser().getPrivilege().getCanEnterDepartmentJob()
+                || (getUser().getPrivilege().getCanEnterDepartmentJob() // Use Department.findDepartmentAssignedToJob() instead?
                 && (getUser().isMemberOf(em, job.getDepartment()) || getUser().isMemberOf(em, job.getSubContractedDepartment())))
                 // Can the user assign a job to themself provided that the user belongs to the job's parent department?
                 || (getUser().getPrivilege().getCanEnterOwnJob()
-                && Objects.equals(getUser().getEmployee().getId(), job.getAssignedTo().getId())
+                && Objects.equals(getUser().getEmployee().getId(), job.getAssignedTo().getId()) // Use Department.findDepartmentAssignedToJob() instead?
                 && (getUser().isMemberOf(em, job.getDepartment()) || getUser().isMemberOf(em, job.getSubContractedDepartment()) ))
                 // Can the user enter any job?
                 || getUser().getPrivilege().getCanEnterJob())) {
@@ -1453,11 +1453,11 @@ public class JobManager implements
             if ( // Can the user's department edit any job?
                     getUser().getEmployee().getDepartment().getPrivilege().getCanEditJob()
                     // Can the user edit a job for the department to which the job is assigned?
-                    || (getUser().getPrivilege().getCanEditDepartmentJob() 
+                    || (getUser().getPrivilege().getCanEditDepartmentJob() // Use Department.findDepartmentAssignedToJob() instead?
                     && (getUser().isMemberOf(em, savedJob.getDepartment()) || getUser().isMemberOf(em, savedJob.getSubContractedDepartment())))
                     // Can the user assign a job to themself provided that the user belongs to the job's parent department?
                     || (getUser().getPrivilege().getCanEditOwnJob()
-                    && Objects.equals(getUser().getEmployee().getId(), savedJob.getAssignedTo().getId())
+                    && Objects.equals(getUser().getEmployee().getId(), savedJob.getAssignedTo().getId()) // Use Department.findDepartmentAssignedToJob() instead?
                     && (getUser().isMemberOf(em, savedJob.getDepartment()) || getUser().isMemberOf(em, savedJob.getSubContractedDepartment())))
                     // Can the user edit any job?
                     || getUser().getPrivilege().getCanEditJob()) {

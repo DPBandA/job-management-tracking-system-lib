@@ -962,7 +962,7 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
             dataCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
             ReportUtils.setExcelCellValue(
                     wb, serviceContractSheet, "F15",
-                    getCurrentJob().getJobCostingAndPayment().getEstimatedCostIncludingTaxes(),
+                    getCurrentJob().getJobCostingAndPayment().getCalculatedCostEstimate(),
                     "Currency", dataCellStyle);
 
             // Minimum First Deposit (J$):
@@ -1066,7 +1066,7 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
                         "java.lang.String", dataCellStyle);
                 ReportUtils.setExcelCellValue(
                         wb, serviceContractSheet, "AL10",
-                        BusinessEntityUtils.roundTo2DecimalPlaces(getCurrentJob().getJobCostingAndPayment().getEstimatedCostIncludingTaxes())
+                        BusinessEntityUtils.roundTo2DecimalPlaces(getCurrentJob().getJobCostingAndPayment().getCalculatedCostEstimate())
                         - BusinessEntityUtils.roundTo2DecimalPlaces(getCurrentJob().getJobCostingAndPayment().getTotalPayment()),
                         "Currency", dataCellStyle);
             }

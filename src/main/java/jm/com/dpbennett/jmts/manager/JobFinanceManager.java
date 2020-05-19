@@ -48,7 +48,7 @@ import jm.com.dpbennett.business.entity.hrm.DepartmentUnit;
 import jm.com.dpbennett.business.entity.fm.Discount;
 import jm.com.dpbennett.business.entity.hrm.Employee;
 import jm.com.dpbennett.business.entity.fm.JobCosting;
-import jm.com.dpbennett.business.entity.fm.JobCostingAndPayment;
+import jm.com.dpbennett.business.entity.jmts.JobCostingAndPayment;
 import jm.com.dpbennett.business.entity.hrm.User;
 import jm.com.dpbennett.business.entity.hrm.Laboratory;
 import jm.com.dpbennett.business.entity.sm.Preference;
@@ -2458,13 +2458,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             } else {
                 // Update estmated cost and min. deposit  
                 // tk may not need to do this here but in the respective get methods
-                if (getCurrentJob().getJobCostingAndPayment().getEstimatedCost() != null) {
-                    Double estimatedCostWithTaxes = getCurrentJob().getJobCostingAndPayment().getEstimatedCost()
-                            + getCurrentJob().getJobCostingAndPayment().getEstimatedCost()
-                            * getCurrentJob().getJobCostingAndPayment().getTax().getValue();
-                    getCurrentJob().getJobCostingAndPayment().setEstimatedCostIncludingTaxes(estimatedCostWithTaxes);
-                    setJobCostingAndPaymentDirty(true);
-                }
+//                if (getCurrentJob().getJobCostingAndPayment().getEstimatedCost() != null) {
+//                    Double estimatedCostWithTaxes = getCurrentJob().getJobCostingAndPayment().getEstimatedCost()
+//                            + getCurrentJob().getJobCostingAndPayment().getEstimatedCost()
+//                            * getCurrentJob().getJobCostingAndPayment().getTax().getValue();
+//                    getCurrentJob().getJobCostingAndPayment().setEstimatedCostIncludingTaxes(estimatedCostWithTaxes);
+//                    setJobCostingAndPaymentDirty(true);
+//                }
 
                 // tk may not need to do this here but in the respective get methods
                 if (getCurrentJob().getJobCostingAndPayment().getMinDeposit() != null) {
