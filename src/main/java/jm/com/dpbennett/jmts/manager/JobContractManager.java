@@ -975,7 +975,7 @@ public class JobContractManager implements Serializable, BusinessEntityManagemen
             dataCellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
             ReportUtils.setExcelCellValue(
                     wb, serviceContractSheet, "F16",
-                    getCurrentJob().getJobCostingAndPayment().getMinDepositIncludingTaxes(),
+                    getCurrentJob().getJobCostingAndPayment().getCalculatedMinDeposit(),
                     "Currency", dataCellStyle);
 
             // RECEIPT #

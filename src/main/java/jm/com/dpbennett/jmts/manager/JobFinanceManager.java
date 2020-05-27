@@ -1257,9 +1257,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     public void reset() {
         init();
     }
-    
+
     public Boolean getEnableSubcontractWithCosting() {
-        return (Boolean) SystemOption.getOptionValueObject(getEntityManager1(), 
+        return (Boolean) SystemOption.getOptionValueObject(getEntityManager1(),
                 "enableSubcontractWithCosting");
     }
 
@@ -2467,13 +2467,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 //                }
 
                 // tk may not need to do this here but in the respective get methods
-                if (getCurrentJob().getJobCostingAndPayment().getMinDeposit() != null) {
-                    Double minDepositWithTaxes = getCurrentJob().getJobCostingAndPayment().getMinDeposit()
-                            + getCurrentJob().getJobCostingAndPayment().getMinDeposit()
-                            * getCurrentJob().getJobCostingAndPayment().getTax().getValue();
-                    getCurrentJob().getJobCostingAndPayment().setMinDepositIncludingTaxes(minDepositWithTaxes);
-                    setJobCostingAndPaymentDirty(true);
-                }
+//                if (getCurrentJob().getJobCostingAndPayment().getMinDeposit() != null) {
+//                    Double minDepositWithTaxes = getCurrentJob().getJobCostingAndPayment().getMinDeposit()
+//                            + getCurrentJob().getJobCostingAndPayment().getMinDeposit()
+//                            * getCurrentJob().getJobCostingAndPayment().getTax().getValue();
+//                    getCurrentJob().getJobCostingAndPayment().setMinDepositIncludingTaxes(minDepositWithTaxes);
+//                    setJobCostingAndPaymentDirty(true);
+//                }
             }
         } else {
             setJobCostingAndPaymentDirty(true);
@@ -2505,8 +2505,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             setJobCostingAndPaymentDirty(true);
         }
     }
-    
-    public Boolean getCanPrepareJobCosting () {
+
+    public Boolean getCanPrepareJobCosting() {
         return !getCurrentJob().getJobCostingAndPayment().getCostingApproved();
     }
 
@@ -2774,9 +2774,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                     PrimeFacesUtils.addMessage("Job Costing and Job Saved", "This job and the costing were saved", FacesMessage.SEVERITY_INFO);
                 } else {
                     PrimeFacesUtils.addMessage("Job Costing and Job NOT Saved", "This job and the costing were NOT saved", FacesMessage.SEVERITY_ERROR);
-                }  
+                }
             }
-            
+
         }
     }
 
@@ -3167,18 +3167,20 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
     /**
      * This determine if taxes can be applied to the current job.
-     * @return 
+     *
+     * @return
      */
     public Boolean getCanApplyTax() {
 
         return JobCostingAndPayment.getCanApplyTax(getCurrentJob())
                 && getCanEditJobCosting();
     }
-    
+
     /**
-     * This determines if the user's main department can apply discounts to
-     * a job costing.
-     * @return 
+     * This determines if the user's main department can apply discounts to a
+     * job costing.
+     *
+     * @return
      */
     public Boolean getCanApplyDiscount() {
 
@@ -3186,13 +3188,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
     }
 
     public Boolean getCanApproveJobCosting() {
-                
+
         return getCanApproveJobCosting(getCurrentJob());
     }
-    
-     public Boolean getCanApproveJobCosting(Job job) {
+
+    public Boolean getCanApproveJobCosting(Job job) {
         EntityManager em = getEntityManager1();
-        
+
         return ((isUserDepartmentSupervisor(job)
                 || (getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(job, em))
                 && getUser().getPrivilege().getCanApproveJobCosting()))
