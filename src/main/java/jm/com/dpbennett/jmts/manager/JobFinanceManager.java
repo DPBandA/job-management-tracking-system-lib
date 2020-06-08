@@ -1709,8 +1709,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
      */
     public Boolean getCanEditJobCosting() {
 
+        return getCanEditJobCosting(getCurrentJob());
+    }
+    
+    public Boolean getCanEditJobCosting(Job job) {
+
         return getUser().getPrivilege().getCanBeFinancialAdministrator()
-                || getCurrentJob().getJobCostingAndPayment().getCashPayments().isEmpty();
+                || job.getJobCostingAndPayment().getCashPayments().isEmpty();
     }
 
     /**
@@ -3128,13 +3133,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         }
     }
 
-    /**
-     *
-     * @return
-     */
     public Boolean getIsJobCompleted() {
-        if (getCurrentJob() != null) {
-            return getCurrentJob().getJobStatusAndTracking().getCompleted();
+        return getIsJobCompleted(getCurrentJob());
+    }
+
+    public Boolean getIsJobCompleted(Job job) {
+        if (job != null) {
+            return job.getJobStatusAndTracking().getCompleted();
         } else {
             return false;
         }
@@ -3172,8 +3177,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
      */
     public Boolean getCanApplyTax() {
 
-        return JobCostingAndPayment.getCanApplyTax(getCurrentJob())
-                && getCanEditJobCosting();
+        return getCanApplyTax(getCurrentJob());
+    }
+    
+    public Boolean getCanApplyTax(Job job) {
+
+        return JobCostingAndPayment.getCanApplyTax(job)
+                && getCanEditJobCosting(job);
     }
 
     /**

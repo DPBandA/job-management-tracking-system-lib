@@ -192,12 +192,20 @@ public class JobManager implements
      */
     public Boolean disableJobDialogField(String field) {
 
+        return disableJobDialogField(getCurrentJob(), field);
+
+    }
+
+    public Boolean disableJobDialogField(Job job, String field) {
+
         Boolean fieldDisablingActive
                 = (Boolean) SystemOption.getOptionValueObject(getEntityManager1(),
                         "activateJobDialogFieldDisabling");
+
         Boolean userHasPrivilege = getUser().getPrivilege().getCanEditDisabledJobField()
                 || getUser().getEmployee().getDepartment().getPrivilege().getCanEditDisabledJobField();
-        Boolean jobIsNotNew = getCurrentJob().getId() != null;
+
+        Boolean jobIsNotNew = job.getId() != null;
 
         switch (field) {
             case "businessOffice":
@@ -219,11 +227,11 @@ public class JobManager implements
             case "department":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (jobIsNotNew)) || getDisableDepartment();
+                        && (jobIsNotNew)) || getDisableDepartment(job);
             case "costingandpayment":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (jobIsNotNew)) || getJobFinanceManager().getIsJobCompleted();
+                        && (jobIsNotNew)) || getJobFinanceManager().getIsJobCompleted(job);
             case "discount":
                 return (fieldDisablingActive
                         && !userHasPrivilege
@@ -231,7 +239,7 @@ public class JobManager implements
             case "tax":
                 return (fieldDisablingActive
                         && !userHasPrivilege
-                        && (jobIsNotNew)) || !getJobFinanceManager().getCanApplyTax();
+                        && (jobIsNotNew)) || !getJobFinanceManager().getCanApplyTax(job);
             default:
                 return false;
         }
@@ -240,11 +248,20 @@ public class JobManager implements
 
     public Boolean getDisableDepartment() {
 
-        return getRenderSubContractingDepartment();
+        return getDisableDepartment(getCurrentJob());
+    }
+
+    public Boolean getDisableDepartment(Job job) {
+
+        return getRenderSubContractingDepartment(job);
     }
 
     public Boolean getRenderSubContractingDepartment() {
-        return getCurrentJob().getIsToBeSubcontracted() || getCurrentJob().getIsSubContract();
+        return getRenderSubContractingDepartment(getCurrentJob());
+    }
+
+    public Boolean getRenderSubContractingDepartment(Job job) {
+        return job.getIsToBeSubcontracted() || job.getIsSubContract();
     }
 
     /**
@@ -273,11 +290,46 @@ public class JobManager implements
 
     public void onJobCellEdit(CellEditEvent event) {
 
-        updateJobWorkProgress(getJobSearchResultList().get(event.getRowIndex()));
+        Job job = getJobSearchResultList().get(event.getRowIndex());
+        Job savedJob = Job.findJobById(getEntityManager1(), job.getId());
 
-        setIsJobDirty(getJobSearchResultList().get(event.getRowIndex()), true);
+        switch (event.getColumn().getHeaderText()) {
+            case "Instructions":
+                if (!disableJobDialogField(job, "instructions") 
+                        && !savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
+                    setIsJobDirty(job, true);
+                    saveJob(job);
+                } else {
+                    PrimeFacesUtils.addMessage("Job NOT Saved!",
+                            "Job was NOT saved because of insufficient privilege or it is flagged as completed.",
+                            FacesMessage.SEVERITY_WARN);
+                }
+                break;
+            case "Submitted":
+                if (!disableJobDialogField(job, "dateSubmitted")
+                        && !savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
+                    setIsJobDirty(job, true);
+                    saveJob(job);
+                } else {
+                    PrimeFacesUtils.addMessage("Job NOT Saved!",
+                            "Job was NOT saved because of insufficient privilege or it is flagged as completed.",
+                            FacesMessage.SEVERITY_WARN);
+                }
+                break;
+            case "EDOC":                
+                if (!savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
+                     updateJobWorkProgress(getJobSearchResultList().get(event.getRowIndex()));
+                    setIsJobDirty(job, true);
+                    saveJob(job);                
+                } else {
+                    PrimeFacesUtils.addMessage("Job NOT Saved!",
+                            "Job was NOT saved because it is flagged as completed.",
+                            FacesMessage.SEVERITY_WARN);
+                }
+                break;
 
-        saveJob(getJobSearchResultList().get(event.getRowIndex()));
+        }
+
     }
 
     public String getApplicationHeader() {
@@ -1441,7 +1493,7 @@ public class JobManager implements
                 // Can the user assign a job to themself provided that the user belongs to the job's parent department?
                 || (getUser().getPrivilege().getCanEnterOwnJob()
                 && Objects.equals(getUser().getEmployee().getId(), job.getAssignedTo().getId()) // Use Department.findDepartmentAssignedToJob() instead?
-                && (getUser().isMemberOf(em, job.getDepartment()) || getUser().isMemberOf(em, job.getSubContractedDepartment()) ))
+                && (getUser().isMemberOf(em, job.getDepartment()) || getUser().isMemberOf(em, job.getSubContractedDepartment())))
                 // Can the user enter any job?
                 || getUser().getPrivilege().getCanEnterJob())) {
 
