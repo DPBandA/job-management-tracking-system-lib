@@ -2331,14 +2331,16 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         if (getCurrentJob().getId() != null) {
             if (!getCurrentJob().findSubcontracts(getEntityManager1()).isEmpty()) {
-                subcontracts.addAll(getCurrentJob().findSubcontracts(getEntityManager1()));
                 subcontracts.removeAll(existingSubcontracts);
+                subcontracts.addAll(getCurrentJob().findSubcontracts(getEntityManager1()));
+                
                 if (!subcontracts.isEmpty()) {
                     return ("{ " + subcontracts.size() + " subcontract(s) exist(s) that can be added as cost item(s) }");
                 }
             } else if (!getCurrentJob().findPossibleSubcontracts(getEntityManager1()).isEmpty()) {
-                subcontracts.addAll(getCurrentJob().findPossibleSubcontracts(getEntityManager1()));
                 subcontracts.removeAll(existingSubcontracts);
+                subcontracts.addAll(getCurrentJob().findPossibleSubcontracts(getEntityManager1()));
+                
                 if (!subcontracts.isEmpty()) {
                     return ("{ " + subcontracts.size() + " possible subcontract(s) exist(s) that can be added as cost item(s) }");
                 }
