@@ -3359,13 +3359,14 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         List<Job> existingSubcontracts = getSubcontractsForCostComponents(getCurrentJob());
 
         if (getCurrentJob().getId() != null) {
+            subcontracts.removeAll(existingSubcontracts);
+            
             if (!getCurrentJob().findSubcontracts(getEntityManager1()).isEmpty()) {
                 subcontracts.addAll(getCurrentJob().findSubcontracts(getEntityManager1()));
             } else {
                 subcontracts.addAll(getCurrentJob().findPossibleSubcontracts(getEntityManager1()));
             }
-
-            subcontracts.removeAll(existingSubcontracts);
+            
             subcontracts.add(0, new Job("-- select a subcontract --"));
         } else {
             subcontracts.add(0, new Job("-- none exists --"));
