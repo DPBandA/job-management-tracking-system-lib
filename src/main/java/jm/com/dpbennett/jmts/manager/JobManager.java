@@ -77,6 +77,7 @@ import jm.com.dpbennett.jmts.JMTSApplication;
 import jm.com.dpbennett.lo.manager.LegalDocumentManager;
 import jm.com.dpbennett.pm.manager.PurchasingManager;
 import jm.com.dpbennett.rm.manager.ReportManager;
+import jm.com.dpbennett.sc.manager.ComplianceManager;
 import jm.com.dpbennett.sm.Authentication.AuthenticationListener;
 import jm.com.dpbennett.sm.manager.SystemManager;
 import org.primefaces.PrimeFaces;
@@ -295,7 +296,7 @@ public class JobManager implements
 
         switch (event.getColumn().getHeaderText()) {
             case "Instructions":
-                if (!disableJobDialogField(job, "instructions") 
+                if (!disableJobDialogField(job, "instructions")
                         && !savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
                     setIsJobDirty(job, true);
                     saveJob(job);
@@ -316,11 +317,11 @@ public class JobManager implements
                             FacesMessage.SEVERITY_WARN);
                 }
                 break;
-            case "EDOC":                
+            case "EDOC":
                 if (!savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
-                     updateJobWorkProgress(getJobSearchResultList().get(event.getRowIndex()));
+                    updateJobWorkProgress(getJobSearchResultList().get(event.getRowIndex()));
                     setIsJobDirty(job, true);
-                    saveJob(job);                
+                    saveJob(job);
                 } else {
                     PrimeFacesUtils.addMessage("Job NOT Saved!",
                             "Job was NOT saved because it is flagged as completed.",
@@ -564,6 +565,10 @@ public class JobManager implements
         return BeanUtils.findBean("purchasingManager");
     }
 
+    public ComplianceManager getComplianceManager() {
+        return BeanUtils.findBean("complianceManager");
+    }
+
     /**
      * Get FinanceManager SessionScoped bean.
      *
@@ -724,6 +729,7 @@ public class JobManager implements
             getReportManager();
             getHumanResourceManager();
             getLegalDocumentManager();
+            getComplianceManager();
 
         } catch (Exception e) {
             System.out.println("An error occured while resetting managers: " + e);
@@ -1770,6 +1776,9 @@ public class JobManager implements
     public void doDefaultSearch() {
 
         switch (getDashboard().getSelectedTabId()) {
+            case "Standards Compliance":
+                getComplianceManager().doSurveySearch();
+                break;
             case "Procurement":
                 getPurchasingManager().doSearch();
                 break;
@@ -1793,19 +1802,6 @@ public class JobManager implements
         doJobSearch();
         openJobBrowser();
 
-//        switch (searchType) {
-//            case "Purchase requisitions":
-//                doPurchaseReqSearch();
-//                break;
-//            case "Suppliers":
-////                getPurchasingManager().doSupplierSearch(searchText);
-////                getPurchasingManager().openSuppliersTab();
-//                break;
-//            default:
-//                doJobSearch();
-//                openJobBrowser();
-//                break;
-//        }
     }
 
     public void doPurchaseReqSearch() { // tk delete if not used
