@@ -1776,7 +1776,7 @@ public class JobManager implements
     public void doDefaultSearch() {
 
         switch (getDashboard().getSelectedTabId()) {
-            case "Standards Compliance":
+            case "Survey Browser":
                 getComplianceManager().doSurveySearch();
                 break;
             case "Procurement":
