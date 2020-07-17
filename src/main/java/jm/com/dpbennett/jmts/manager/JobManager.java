@@ -1406,14 +1406,13 @@ public class JobManager implements
         }
     }
 
-    public void copyJob(ActionEvent actionEvent) {
-
-        if (currentJob != null) {
-            PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
-        }
-
-    }
-
+//    public void copyJob(ActionEvent actionEvent) {
+//
+//        //if (currentJob != null) {
+//            PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
+//        //}
+//
+//    }
     public void cancelClientEdit(ActionEvent actionEvent) {
         if (currentJob.getClient().getId() == null) {
             currentJob.getClient().setName("");
@@ -1964,29 +1963,21 @@ public class JobManager implements
             PrimeFacesUtils.addMessage("Job Copy NOT Created",
                     "A subcontract cannot be copied",
                     FacesMessage.SEVERITY_ERROR);
-            return;
+
+        } else {
+
+            currentJob = Job.copy(em, job, getUser(), true, true);
+
+            getJobFinanceManager().setEnableOnlyPaymentEditing(false);
+            
+            PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
+
+            PrimeFacesUtils.addMessage("Job Copied",
+                    "The current job was copied but the copy was not saved. "
+                    + "Please enter or change the details for the copied job as required",
+                    FacesMessage.SEVERITY_INFO);            
         }
 
-        currentJob = Job.copy(em, job, getUser(), true, true);
-        //currentJob.setClassification(new Classification());
-        //currentJob.setSubContractedDepartment(new Department());
-        getJobFinanceManager().setEnableOnlyPaymentEditing(false);
-
-        PrimeFacesUtils.addMessage("Job Copied",
-                "The current job was copied but the copy was not saved. "
-                + "Please enter or change the details for the copied job as required",
-                FacesMessage.SEVERITY_INFO);
-        // } 
-//        else {
-//            PrimeFacesUtils.addMessage("Job Copy NOT Created",
-//                    "The job copy was not created. Contact your System Administrator",
-//                    FacesMessage.SEVERITY_ERROR);
-//        }
-
-//        this.currentJob = getSavedCurrentJob(currentJob);
-//        this.currentJob.setVisited(true);
-//        this.currentJob.getJobStatusAndTracking().setEditStatus("        ");
-//        getJobFinanceManager().setEnableOnlyPaymentEditing(false);
     }
 
     public void setEditJobCosting(Job currentJob) {
