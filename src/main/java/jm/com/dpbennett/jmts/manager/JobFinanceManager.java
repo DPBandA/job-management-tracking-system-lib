@@ -1711,7 +1711,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         return getCanEditJobCosting(getCurrentJob());
     }
-    
+
     public Boolean getCanEditJobCosting(Job job) {
 
         return getUser().getPrivilege().getCanBeFinancialAdministrator()
@@ -2333,14 +2333,14 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             if (!getCurrentJob().findSubcontracts(getEntityManager1()).isEmpty()) {
                 subcontracts.removeAll(existingSubcontracts);
                 subcontracts.addAll(getCurrentJob().findSubcontracts(getEntityManager1()));
-                
+
                 if (!subcontracts.isEmpty()) {
                     return ("{ " + subcontracts.size() + " subcontract(s) exist(s) that can be added as cost item(s) }");
                 }
             } else if (!getCurrentJob().findPossibleSubcontracts(getEntityManager1()).isEmpty()) {
                 subcontracts.removeAll(existingSubcontracts);
                 subcontracts.addAll(getCurrentJob().findPossibleSubcontracts(getEntityManager1()));
-                
+
                 if (!subcontracts.isEmpty()) {
                     return ("{ " + subcontracts.size() + " possible subcontract(s) exist(s) that can be added as cost item(s) }");
                 }
@@ -2463,24 +2463,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
                 setJobCostingAndPaymentDirty(false);
             } else {
-                // Update estmated cost and min. deposit  
-                // tk may not need to do this here but in the respective get methods
-//                if (getCurrentJob().getJobCostingAndPayment().getEstimatedCost() != null) {
-//                    Double estimatedCostWithTaxes = getCurrentJob().getJobCostingAndPayment().getEstimatedCost()
-//                            + getCurrentJob().getJobCostingAndPayment().getEstimatedCost()
-//                            * getCurrentJob().getJobCostingAndPayment().getTax().getValue();
-//                    getCurrentJob().getJobCostingAndPayment().setEstimatedCostIncludingTaxes(estimatedCostWithTaxes);
-//                    setJobCostingAndPaymentDirty(true);
-//                }
 
-                // tk may not need to do this here but in the respective get methods
-//                if (getCurrentJob().getJobCostingAndPayment().getMinDeposit() != null) {
-//                    Double minDepositWithTaxes = getCurrentJob().getJobCostingAndPayment().getMinDeposit()
-//                            + getCurrentJob().getJobCostingAndPayment().getMinDeposit()
-//                            * getCurrentJob().getJobCostingAndPayment().getTax().getValue();
-//                    getCurrentJob().getJobCostingAndPayment().setMinDepositIncludingTaxes(minDepositWithTaxes);
-//                    setJobCostingAndPaymentDirty(true);
-//                }
+                setJobCostingAndPaymentDirty(true);
+               
             }
         } else {
             setJobCostingAndPaymentDirty(true);
@@ -3181,7 +3166,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         return getCanApplyTax(getCurrentJob());
     }
-    
+
     public Boolean getCanApplyTax(Job job) {
 
         return JobCostingAndPayment.getCanApplyTax(job)
@@ -3360,13 +3345,13 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         if (getCurrentJob().getId() != null) {
             subcontracts.removeAll(existingSubcontracts);
-            
+
             if (!getCurrentJob().findSubcontracts(getEntityManager1()).isEmpty()) {
                 subcontracts.addAll(getCurrentJob().findSubcontracts(getEntityManager1()));
             } else {
                 subcontracts.addAll(getCurrentJob().findPossibleSubcontracts(getEntityManager1()));
             }
-            
+
             subcontracts.add(0, new Job("-- select a subcontract --"));
         } else {
             subcontracts.add(0, new Job("-- none exists --"));
