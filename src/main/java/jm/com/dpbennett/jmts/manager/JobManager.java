@@ -1973,8 +1973,8 @@ public class JobManager implements
             PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
 
             PrimeFacesUtils.addMessage("Job Copied",
-                    "The current job was copied but the copy was not saved. "
-                    + "Please enter or change the details for the copied job as required",
+                    /*"The current job was copied but the copy was not saved. "
+                    + "Please enter or change the details for the copied job as required"*/"",
                     FacesMessage.SEVERITY_INFO);            
         }
 
