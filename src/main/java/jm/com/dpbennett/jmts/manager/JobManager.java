@@ -1956,15 +1956,14 @@ public class JobManager implements
         this.currentJob.getJobStatusAndTracking().setEditStatus("        ");
         getJobFinanceManager().setEnableOnlyPaymentEditing(false);
     }
+   
 
-    public void setEditCurrentJobCopy(Job job) {
+    public void copyCurrentJob() {
 
         EntityManager em = getEntityManager1();
 
-        // Do not allow copying of suhcontracts tk
-        if (job.getIsSubContract()) {
-
-            currentJob = null;
+        // Do not allow copying of suhcontracts
+        if (currentJob.getIsSubContract()) {
 
             PrimeFacesUtils.addMessage("Job Copy NOT Created",
                     "A subcontract cannot be copied",
@@ -1972,15 +1971,13 @@ public class JobManager implements
 
         } else {
 
-            currentJob = Job.copy(em, job, getUser(), true, true);
+            currentJob = Job.copy(em, currentJob, getUser(), true, true);
 
             getJobFinanceManager().setEnableOnlyPaymentEditing(false);
 
-            PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
-
             PrimeFacesUtils.addMessage("Job Copied",
-                    /*"The current job was copied but the copy was not saved. "
-                    + "Please enter or change the details for the copied job as required"*/ "",
+                    "The current job was copied but the copy was not saved. "
+                    + "Please enter or change the details for the copied job as required",
                     FacesMessage.SEVERITY_INFO);
         }
 
