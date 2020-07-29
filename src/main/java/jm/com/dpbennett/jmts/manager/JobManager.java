@@ -1288,15 +1288,28 @@ public class JobManager implements
                 // Save current job as parent job for use in the subcontract
                 Job parent = currentJob;
                 // Create copy of job and use current sequence number and year.                
-                Long currentJobSequenceNumber = currentJob.getJobSequenceNumber();
-                Integer yearReceived = currentJob.getYearReceived();
-                currentJob = Job.copy(em, currentJob, getUser(), true, true);
+                Long currentJobSequenceNumber = parent.getJobSequenceNumber();
+                Integer yearReceived = parent.getYearReceived();
+                currentJob = Job.copy(em, parent, getUser(), true, true);
                 currentJob.setParent(parent);
                 currentJob.setClassification(new Classification());
+                currentJob.setClient(new Client());
+                currentJob.setBillingAddress(new Address());
+                currentJob.setContact(new Contact());
+                currentJob.setAssignedTo(new Employee());
+                currentJob.setRepresentatives(null);
+                currentJob.setEstimatedTurnAroundTimeInDays(0);
+                currentJob.setEstimatedTurnAroundTimeRequired(true);
+                currentJob.setInstructions("");
+                currentJob.setSector(Sector.findSectorByName(em, "--"));
+                currentJob.setJobCategory(JobCategory.findJobCategoryByName(em, "--"));
+                currentJob.setJobSubCategory(JobSubCategory.findJobSubCategoryByName(em, "--"));
                 currentJob.setSubContractedDepartment(new Department());
                 currentJob.setIsToBeSubcontracted(isSubcontract);
+                currentJob.getJobStatusAndTracking().setDateAndTimeEntered(null);
                 currentJob.setYearReceived(yearReceived);
                 currentJob.setJobSequenceNumber(currentJobSequenceNumber);
+                currentJob.setJobNumber(Job.getJobNumber(currentJob, em));
 
                 if (copyCosting) {
                     currentJob.getJobCostingAndPayment().setCostComponents(
@@ -1406,13 +1419,6 @@ public class JobManager implements
         }
     }
 
-//    public void copyJob(ActionEvent actionEvent) {
-//
-//        //if (currentJob != null) {
-//            PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
-//        //}
-//
-//    }
     public void cancelClientEdit(ActionEvent actionEvent) {
         if (currentJob.getClient().getId() == null) {
             currentJob.getClient().setName("");
@@ -1969,13 +1975,13 @@ public class JobManager implements
             currentJob = Job.copy(em, job, getUser(), true, true);
 
             getJobFinanceManager().setEnableOnlyPaymentEditing(false);
-            
+
             PrimeFacesUtils.openDialog(null, "jobDialog", true, true, true, true, 600, 975);
 
             PrimeFacesUtils.addMessage("Job Copied",
                     /*"The current job was copied but the copy was not saved. "
-                    + "Please enter or change the details for the copied job as required"*/"",
-                    FacesMessage.SEVERITY_INFO);            
+                    + "Please enter or change the details for the copied job as required"*/ "",
+                    FacesMessage.SEVERITY_INFO);
         }
 
     }
