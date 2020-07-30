@@ -2140,7 +2140,7 @@ public class JobManager implements
         sr.setJobCategory(JobCategory.findJobCategoryByName(em, "--"));
         sr.setJobSubCategory(JobSubCategory.findJobSubCategoryByName(em, "--"));
 
-        sr.setServiceContract(ServiceContract.create());
+        sr.setServiceContract(new ServiceContract());
         sr.setAutoGenerateServiceRequestNumber(autoGenerateServiceRequestNumber);
 
         sr.setDateSubmitted(new Date());
