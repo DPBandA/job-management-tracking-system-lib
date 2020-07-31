@@ -221,6 +221,7 @@ public class JobManager implements
             case "tatRequired":
             case "instructions":
             case "service":
+            case "serviceLocation":
             case "samples":
             case "otherService":
                 return fieldDisablingActive
