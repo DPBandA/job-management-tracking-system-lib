@@ -1310,6 +1310,9 @@ public class JobManager implements
                 currentJob.setYearReceived(yearReceived);
                 currentJob.setJobSequenceNumber(currentJobSequenceNumber);
                 currentJob.setJobNumber(Job.getJobNumber(currentJob, em));
+                // Services
+                currentJob.setServiceContract(new ServiceContract());
+                currentJob.setServices(null);
 
                 if (copyCosting) {
                     currentJob.getJobCostingAndPayment().setCostComponents(
@@ -2132,17 +2135,13 @@ public class JobManager implements
         sr.setClient(new Client("", false));
         sr.setServiceRequestNumber("");
         sr.setJobDescription("");
-
         sr.setBusinessOffice(BusinessOffice.findDefaultBusinessOffice(em, "Head Office"));
-
         sr.setClassification(Classification.findClassificationByName(em, "--"));
         sr.setSector(Sector.findSectorByName(em, "--"));
         sr.setJobCategory(JobCategory.findJobCategoryByName(em, "--"));
         sr.setJobSubCategory(JobSubCategory.findJobSubCategoryByName(em, "--"));
-
         sr.setServiceContract(new ServiceContract());
         sr.setAutoGenerateServiceRequestNumber(autoGenerateServiceRequestNumber);
-
         sr.setDateSubmitted(new Date());
 
         return sr;
