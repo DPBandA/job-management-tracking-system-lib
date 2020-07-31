@@ -210,6 +210,7 @@ public class JobManager implements
 
         switch (field) {
             case "businessOffice":
+            case "classification":
             case "client":
             case "clientActionsMenu":
             case "billingAddress":
@@ -1959,7 +1960,6 @@ public class JobManager implements
         this.currentJob.getJobStatusAndTracking().setEditStatus("        ");
         getJobFinanceManager().setEnableOnlyPaymentEditing(false);
     }
-   
 
     public void copyCurrentJob() {
 
@@ -1971,7 +1971,10 @@ public class JobManager implements
             PrimeFacesUtils.addMessage("Job Copy NOT Created",
                     "A subcontract cannot be copied",
                     FacesMessage.SEVERITY_ERROR);
-
+        } else if (currentJob.getId() == null || currentJob.getIsDirty()) {
+            PrimeFacesUtils.addMessage("Job Copy NOT Created",
+                    "The current job must be saved before it can be copied",
+                    FacesMessage.SEVERITY_ERROR);
         } else {
 
             currentJob = Job.copy(em, currentJob, getUser(), true, true);
