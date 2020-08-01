@@ -1,6 +1,6 @@
 /*
 Job Management & Tracking System (JMTS) 
-Copyright (C) 2017  D P Bennett & Associates Limited
+Copyright (C) 2020  D P Bennett & Associates Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -123,6 +123,10 @@ public class JobManager implements
      */
     public JobManager() {
         init();
+    }
+    
+    private void processJobActions() {
+        
     }
 
     public void editStatusNote() {
@@ -295,9 +299,25 @@ public class JobManager implements
     }
 
     public void onJobCellEdit(CellEditEvent event) {
-
+        EntityManager em = getEntityManager1();
         Job job = getJobSearchResultList().get(event.getRowIndex());
         Job savedJob = Job.findJobById(getEntityManager1(), job.getId());
+        
+        if (!isJobNew(job)) {
+            savedJob = Job.findJobById(em, job.getId());
+            if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
+                    && !User.isUserDepartmentSupervisor(savedJob, getUser(), em)) {
+
+                job.setIsDirty(false);
+
+                PrimeFacesUtils.addMessage(
+                        "Job Cannot Be Saved",
+                        "This job is marked as completed so changes cannot be saved. You may contact your supervisor or a system administrator",
+                        FacesMessage.SEVERITY_ERROR);
+
+                return;
+            }
+        }
 
         switch (event.getColumn().getHeaderText()) {
             case "Instructions":
@@ -305,35 +325,15 @@ public class JobManager implements
                         && !savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
                     setIsJobDirty(job, true);
                     saveJob(job);
-                } else {
-                    PrimeFacesUtils.addMessage("Job NOT Saved!",
-                            "Job was NOT saved because of insufficient privilege or it is flagged as completed.",
-                            FacesMessage.SEVERITY_WARN);
-                }
+                } 
                 break;
             case "Submitted":
                 if (!disableJobDialogField(job, "dateSubmitted")
                         && !savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
                     setIsJobDirty(job, true);
                     saveJob(job);
-                } else {
-                    PrimeFacesUtils.addMessage("Job NOT Saved!",
-                            "Job was NOT saved because of insufficient privilege or it is flagged as completed.",
-                            FacesMessage.SEVERITY_WARN);
-                }
+                }  
                 break;
-            case "EDOC":
-                if (!savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
-                    updateJobWorkProgress(getJobSearchResultList().get(event.getRowIndex()));
-                    setIsJobDirty(job, true);
-                    saveJob(job);
-                } else {
-                    PrimeFacesUtils.addMessage("Job NOT Saved!",
-                            "Job was NOT saved because it is flagged as completed.",
-                            FacesMessage.SEVERITY_WARN);
-                }
-                break;
-
         }
 
     }
@@ -621,7 +621,6 @@ public class JobManager implements
     }
 
     public void updateDateSearchField() {
-        //doSearch();
     }
 
     public String getSearchType() {
@@ -642,12 +641,11 @@ public class JobManager implements
         searchTypes.add(new SelectItem("Unapproved job costings", "Unapproved job costings"));
         searchTypes.add(new SelectItem("Appr'd & uninv'd jobs", "Appr'd & uninv'd jobs"));
         searchTypes.add(new SelectItem("Incomplete jobs", "Incomplete jobs"));
-        //searchTypes.add(new SelectItem("Purchase requisitions", "Purchase requisitions"));
-        //searchTypes.add(new SelectItem("Suppliers", "Suppliers"));
 
         return searchTypes;
     }
 
+    // tk check if this needs to be in this class
     public ArrayList getDateSearchFields() {
         ArrayList dateSearchFields = new ArrayList();
 
@@ -837,17 +835,6 @@ public class JobManager implements
         this.showJobEntry = showJobEntry;
     }
 
-//    private Boolean isCurrentJobAssignedToUser() {
-//        return isJobAssignedToUser(getCurrentJob());
-//    }
-    private Boolean isJobAssignedToUser(Job job) {
-        if (getUser() != null) {
-            return job.getAssignedTo().getId().longValue() == getUser().getEmployee().getId().longValue();
-        } else {
-            return false;
-        }
-    }
-
     private Boolean isJobAssignedToUserDepartment() {
 
         if (getUser() != null) {
@@ -914,12 +901,6 @@ public class JobManager implements
         return longProcessProgress;
     }
 
-//    public void onLongProcessComplete() {
-//        longProcessProgress = 0;
-//    }
-//    public void setLongProcessProgress(Integer longProcessProgress) {
-//        this.longProcessProgress = longProcessProgress;
-//    }
     /**
      * For future implementation if necessary
      *
@@ -948,11 +929,8 @@ public class JobManager implements
         try {
 
             serviceContractStreamContent = getJobContractManager().getServiceContractStreamContent();
-
-//            setLongProcessProgress(100);
         } catch (Exception e) {
             System.out.println(e);
-//            setLongProcessProgress(0);
         }
 
         return serviceContractStreamContent;
@@ -1043,7 +1021,6 @@ public class JobManager implements
         currentJob.getJobStatusAndTracking().setSamplesCollected(b);
     }
 
-    // documents collected by
     public Boolean getDocumentCollected() {
         if (currentJob != null) {
             return currentJob.getJobStatusAndTracking().getDocumentCollected();
@@ -1474,8 +1451,6 @@ public class JobManager implements
         if (!isJobNew(job)) {
             savedJob = Job.findJobById(em, job.getId());
             if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
-                    //&& !user.isMemberOf(em, Department.findDepartmentBySystemOptionDeptId("invoicingDepartmentId", em))
-                    //&& !user.getPrivilege().getCanBeJMTSAdministrator()
                     && !User.isUserDepartmentSupervisor(savedJob, getUser(), em)) {
 
                 job.setIsDirty(false);
@@ -1784,13 +1759,12 @@ public class JobManager implements
         }
     }
 
-    public List<Job> findJobs(/*Boolean includeSampleSearch, */Integer maxResults) {
+    public List<Job> findJobs(Integer maxResults) {
         return Job.findJobsByDateSearchField(getEntityManager1(),
                 getUser(),
                 getDateSearchPeriod(),
                 getSearchType(),
                 getSearchText(),
-                /*includeSampleSearch,*/
                 maxResults);
     }
 
@@ -1825,25 +1799,10 @@ public class JobManager implements
 
     }
 
-    public void doPurchaseReqSearch() { // tk delete if not used
-//        getPurchasingManager().doPurchaseReqSearch(
-//                getPurchasingManager().getDateSearchPeriod(),
-//                getPurchasingManager().getSearchType(),
-//                getPurchasingManager().getPurchaseReqSearchText(),
-//                getUser().getEmployee().getDepartment().getId());
-//
-//        getPurchasingManager().openPurchaseReqsTab();
-    }
-
     public void doJobSearch() {
 
         if (getUser().getId() != null) {
-            jobSearchResultList = findJobs(/*false, */0);
-//
-//            if (jobSearchResultList.isEmpty()) {
-//                jobSearchResultList = findJobs(true, 0);
-//            }
-
+            jobSearchResultList = findJobs(0);
         } else {
             jobSearchResultList = new ArrayList<>();
         }
@@ -1853,11 +1812,8 @@ public class JobManager implements
     public void doJobSearch(Integer maxResults) {
 
         if (getUser().getId() != null) {
-            jobSearchResultList = findJobs(/*false, */maxResults);
+            jobSearchResultList = findJobs(maxResults);
 
-//            if (jobSearchResultList.isEmpty()) {
-//                jobSearchResultList = findJobs(true, maxResults);
-//            }
         } else {
             jobSearchResultList = new ArrayList<>();
         }
@@ -1893,7 +1849,6 @@ public class JobManager implements
     }
 
     public List<Address> getClientAddresses() {
-        EntityManager em = getEntityManager1();
 
         List<Address> addresses = getCurrentJob().getClient().getAddresses();
 
@@ -1995,7 +1950,7 @@ public class JobManager implements
 
     public void setEditJobCosting(Job currentJob) {
 
-        this.currentJob = getSavedCurrentJob(currentJob);;
+        this.currentJob = getSavedCurrentJob(currentJob);
         this.currentJob.setVisited(true);
 
         setSelectedJobs(new Job[]{});
@@ -2041,11 +1996,7 @@ public class JobManager implements
 
     public void updateDepartment() {
 
-        EntityManager em;
-
         try {
-
-            em = getEntityManager1();
 
             if (currentJob.getAutoGenerateJobNumber()) {
                 currentJob.setJobNumber(getCurrentJobNumber());
@@ -2064,11 +2015,9 @@ public class JobManager implements
     }
 
     public void updateSubContractedDepartment() {
-        EntityManager em;
-
+     
         try {
-            em = getEntityManager1();
-
+           
             if (currentJob.getAutoGenerateJobNumber()) {
                 currentJob.setJobNumber(getCurrentJobNumber());
             }
@@ -2182,7 +2131,7 @@ public class JobManager implements
             String username,
             String password) {
 
-        // setup new database connection properties
+        // Setup new database connection properties
         HashMap<String, String> prop = new HashMap<>();
         prop.put("javax.persistence.jdbc.user", username);
         prop.put("javax.persistence.jdbc.password", password);
@@ -2413,6 +2362,7 @@ public class JobManager implements
         if (getUser().getModules().getJobManagementAndTrackingModule()) {
             getSystemManager().getDashboard().openTab("Job Management");
         }
+        
     }
 
     @Override
