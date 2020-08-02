@@ -44,6 +44,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceUnit;
+import jm.com.dpbennett.business.entity.BusinessEntity;
 import jm.com.dpbennett.business.entity.StatusNote;
 import jm.com.dpbennett.business.entity.fm.Classification;
 import jm.com.dpbennett.business.entity.cm.Client;
@@ -69,6 +70,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
 import jm.com.dpbennett.business.entity.sm.Alert;
+import jm.com.dpbennett.business.entity.util.BusinessEntityActionUtils;
 import jm.com.dpbennett.business.entity.util.ReturnMessage;
 import jm.com.dpbennett.cm.manager.ClientManager;
 import jm.com.dpbennett.fm.manager.FinanceManager;
@@ -124,9 +126,26 @@ public class JobManager implements
     public JobManager() {
         init();
     }
-    
+
     private void processJobActions() {
-        
+        for (BusinessEntity.Action action : getCurrentJob().getActions()) {
+            switch (action) {
+                case CREATE:
+                    System.out.println("Create action");
+                    break;
+                case APPROVE:
+                    System.out.println("Approve action");
+                    break;
+                case PAYMENT:
+                    System.out.println("Payment action");
+                    break;
+                default:
+                    System.out.println("No action");
+                    break;
+            }
+        }
+
+        getCurrentJob().getActions().clear();
     }
 
     public void editStatusNote() {
@@ -225,12 +244,12 @@ public class JobManager implements
             case "tatRequired":
             case "instructions":
             case "service":
-            case "additionalService":    
+            case "additionalService":
             case "serviceLocation":
             case "specialInstructions":
             case "samples":
             case "otherServiceText":
-            case "additionalServiceOtherText":    
+            case "additionalServiceOtherText":
                 return fieldDisablingActive
                         && !userHasPrivilege
                         && jobIsNotNew;
@@ -302,7 +321,7 @@ public class JobManager implements
         EntityManager em = getEntityManager1();
         Job job = getJobSearchResultList().get(event.getRowIndex());
         Job savedJob = Job.findJobById(getEntityManager1(), job.getId());
-        
+
         if (!isJobNew(job)) {
             savedJob = Job.findJobById(em, job.getId());
             if (savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")
@@ -325,14 +344,14 @@ public class JobManager implements
                         && !savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
                     setIsJobDirty(job, true);
                     saveJob(job);
-                } 
+                }
                 break;
             case "Submitted":
                 if (!disableJobDialogField(job, "dateSubmitted")
                         && !savedJob.getJobStatusAndTracking().getWorkProgress().equals("Completed")) {
                     setIsJobDirty(job, true);
                     saveJob(job);
-                }  
+                }
                 break;
         }
 
@@ -1315,6 +1334,9 @@ public class JobManager implements
                 } else {
                     setIsDirty(false);
                 }
+
+                BusinessEntityActionUtils.addAction(BusinessEntity.Action.CREATE,
+                        currentJob.getActions());
             }
 
             getJobFinanceManager().setAccPacCustomer(new AccPacCustomer(""));
@@ -1420,7 +1442,7 @@ public class JobManager implements
         doJobSearch();
     }
 
-    private void prepareAndSaveJob(Job job) {
+    private boolean prepareAndSaveJob(Job job) {
         ReturnMessage returnMessage;
 
         returnMessage = job.prepareAndSave(getEntityManager1(), getUser());
@@ -1428,6 +1450,8 @@ public class JobManager implements
         if (returnMessage.isSuccess()) {
             PrimeFacesUtils.addMessage("Saved!", "Job was saved", FacesMessage.SEVERITY_INFO);
             job.getJobStatusAndTracking().setEditStatus("        ");
+
+            return true;
         } else {
             PrimeFacesUtils.addMessage("Job NOT Saved!",
                     "Job was NOT saved. Please contact the System Administrator!",
@@ -1439,6 +1463,8 @@ public class JobManager implements
                     + "\nDate/time: " + new Date()
                     + "\nDetail: " + returnMessage.getDetail());
         }
+
+        return false;
     }
 
     public void saveJob(Job job) {
@@ -1499,7 +1525,9 @@ public class JobManager implements
                 // Can the user enter any job?
                 || getUser().getPrivilege().getCanEnterJob())) {
 
-            prepareAndSaveJob(job);
+            if (prepareAndSaveJob(job)) {
+                processJobActions();
+            }
 
         } else if (!isJobNew(job)) {
             savedJob = Job.findJobById(em, job.getId());
@@ -1516,7 +1544,10 @@ public class JobManager implements
                     // Can the user edit any job?
                     || getUser().getPrivilege().getCanEditJob()) {
 
-                prepareAndSaveJob(job);
+                if (prepareAndSaveJob(job)) {
+                    processJobActions();
+                }
+                
             } else {
                 PrimeFacesUtils.addMessage("Insufficient Privilege",
                         "You do not have the privilege to enter/edit jobs. \n"
@@ -1937,7 +1968,8 @@ public class JobManager implements
         } else {
 
             currentJob = Job.copy(em, currentJob, getUser(), true, true);
-
+            BusinessEntityActionUtils.addAction(BusinessEntity.Action.CREATE,
+                        currentJob.getActions());
             getJobFinanceManager().setEnableOnlyPaymentEditing(false);
 
             PrimeFacesUtils.addMessage("Job Copied",
@@ -2015,9 +2047,9 @@ public class JobManager implements
     }
 
     public void updateSubContractedDepartment() {
-     
+
         try {
-           
+
             if (currentJob.getAutoGenerateJobNumber()) {
                 currentJob.setJobNumber(getCurrentJobNumber());
             }
@@ -2362,7 +2394,7 @@ public class JobManager implements
         if (getUser().getModules().getJobManagementAndTrackingModule()) {
             getSystemManager().getDashboard().openTab("Job Management");
         }
-        
+
     }
 
     @Override
