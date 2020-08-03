@@ -130,6 +130,7 @@ public class JobManager implements
 
     private void sendJobEmail(
             EntityManager em,
+            Employee sendTo,
             String role,
             String action) {
 
@@ -147,7 +148,7 @@ public class JobManager implements
         String instructions = getCurrentJob().getInstructions();
 
         Utils.postMail(null, null,
-                null,
+                sendTo,
                 email.getSubject().
                         replace("{action}", action).
                         replace("{jobNumber}", jobNumber),
@@ -164,21 +165,23 @@ public class JobManager implements
     }
     
     private void emailJobAssignee() {
-        sendJobEmail(getEntityManager1(), "job assignee", "entered");
+        sendJobEmail(getEntityManager1(), 
+                getCurrentJob().getAssignedTo(),
+                "job assignee", "entered");
     }
 
     private void processJobActions() {
         for (BusinessEntity.Action action : getCurrentJob().getActions()) {
             switch (action) {
                 case CREATE:
-                    System.out.println("Create action");
+                    System.out.println("Processing create action...");
                     emailJobAssignee();
                     break;
                 case APPROVE:
-                    System.out.println("Approve action");
+                    System.out.println("Processing approve action...");
                     break;
                 case PAYMENT:
-                    System.out.println("Payment action");
+                    System.out.println("Processing payment action...");
                     break;
                 default:
                     System.out.println("No action");
