@@ -154,6 +154,8 @@ public class JobManager implements
                         replace("{jobNumber}", jobNumber),
                 email.getContent("/correspondences/").
                         replace("{assignee}", assignee).
+                        replace("{action}", action).
+                        replace("{jobNumber}", jobNumber).
                         replace("{APPURL}", APPURL).
                         replace("{enteredBy}", enteredBy).
                         replace("{department}", department).
@@ -163,9 +165,9 @@ public class JobManager implements
                 email.getContentType(),
                 em);
     }
-    
+
     private void emailJobAssignee() {
-        sendJobEmail(getEntityManager1(), 
+        sendJobEmail(getEntityManager1(),
                 getCurrentJob().getAssignedTo(),
                 "job assignee", "entered");
     }
