@@ -69,6 +69,7 @@ import jm.com.dpbennett.business.entity.util.BusinessEntityUtils;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.StreamedContent;
 import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
+import jm.com.dpbennett.business.entity.hrm.Email;
 import jm.com.dpbennett.business.entity.sm.Alert;
 import jm.com.dpbennett.business.entity.util.BusinessEntityActionUtils;
 import jm.com.dpbennett.business.entity.util.ReturnMessage;
@@ -127,11 +128,51 @@ public class JobManager implements
         init();
     }
 
+    private void sendJobEmail(
+            EntityManager em,
+            String role,
+            String action) {
+
+        Email email = Email.findActiveEmailByName(em, "job-email-template");
+
+        String jobNumber = getCurrentJob().getJobNumber();
+        String department = getCurrentJob().getDepartmentAssignedToJob().getName();
+        String APPURL = (String) SystemOption.getOptionValueObject(em, "appURL");
+        String assignee = getCurrentJob().getAssignedTo().getFirstName()
+                + " " + getCurrentJob().getAssignedTo().getLastName();
+        String enteredBy = getCurrentJob().getJobStatusAndTracking().getEnteredBy().getFirstName()
+                + " " + getCurrentJob().getJobStatusAndTracking().getEnteredBy().getLastName();
+        String dateSubmitted = BusinessEntityUtils.
+                getDateInMediumDateFormat(getCurrentJob().getJobStatusAndTracking().getDateSubmitted());
+        String instructions = getCurrentJob().getInstructions();
+
+        Utils.postMail(null, null,
+                null,
+                email.getSubject().
+                        replace("{action}", action).
+                        replace("{jobNumber}", jobNumber),
+                email.getContent("/correspondences/").
+                        replace("{assignee}", assignee).
+                        replace("{APPURL}", APPURL).
+                        replace("{enteredBy}", enteredBy).
+                        replace("{department}", department).
+                        replace("{dateSubmitted}", dateSubmitted).
+                        replace("{role}", role).
+                        replace("{instructions}", instructions),
+                email.getContentType(),
+                em);
+    }
+    
+    private void emailJobAssignee() {
+        sendJobEmail(getEntityManager1(), "job assignee", "entered");
+    }
+
     private void processJobActions() {
         for (BusinessEntity.Action action : getCurrentJob().getActions()) {
             switch (action) {
                 case CREATE:
                     System.out.println("Create action");
+                    emailJobAssignee();
                     break;
                 case APPROVE:
                     System.out.println("Approve action");
@@ -1547,7 +1588,7 @@ public class JobManager implements
                 if (prepareAndSaveJob(job)) {
                     processJobActions();
                 }
-                
+
             } else {
                 PrimeFacesUtils.addMessage("Insufficient Privilege",
                         "You do not have the privilege to enter/edit jobs. \n"
@@ -1572,39 +1613,6 @@ public class JobManager implements
 
     public Boolean getIsBillingAddressNameValid() {
         return BusinessEntityUtils.validateText(currentJob.getBillingAddress().getName());
-    }
-
-    /**
-     * NB: Message body and subject are to be obtained from a "template". The
-     * variables in the template are to be inserted where {variable} appears.
-     *
-     * @param job
-     * @return
-     */
-    public String getNewJobEmailMessage(Job job) {
-        String message = "";
-        DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
-
-        message = message + "Dear Job Assignee,<br><br>";
-        message = message + "A job with the following details was assigned to your department via the <a href='http://boshrmapp:8080/jmts'>Job Management & Tracking System (JMTS)</a>:<br><br>";
-        message = message + "<span style='font-weight:bold'>Job number: </span>" + job.getJobNumber() + "<br>";
-        message = message + "<span style='font-weight:bold'>Client: </span>" + job.getClient().getName() + "<br>";
-        if (!job.getSubContractedDepartment().getName().equals("--")) {
-            message = message + "<span style='font-weight:bold'>Department: </span>" + job.getSubContractedDepartment().getName() + "<br>";
-        } else {
-            message = message + "<span style='font-weight:bold'>Department: </span>" + job.getDepartment().getName() + "<br>";
-        }
-        message = message + "<span style='font-weight:bold'>Date submitted: </span>" + formatter.format(job.getJobStatusAndTracking().getDateSubmitted()) + "<br>";
-        message = message + "<span style='font-weight:bold'>Current assignee: </span>" + BusinessEntityUtils.getPersonFullName(job.getAssignedTo(), Boolean.FALSE) + "<br>";
-        message = message + "<span style='font-weight:bold'>Entered by: </span>" + BusinessEntityUtils.getPersonFullName(job.getJobStatusAndTracking().getEnteredBy(), Boolean.FALSE) + "<br>";
-        message = message + "<span style='font-weight:bold'>Task/Sample descriptions: </span>" + job.getJobSampleDescriptions() + "<br><br>";
-        message = message + "If you are the department's supervisor, you should immediately ensure that the job was correctly assigned to your staff member who will see to its completion.<br><br>";
-        message = message + "If this job was incorrectly assigned to your department, the department supervisor should contact the person who entered/assigned the job.<br><br>";
-        message = message + "This email was automatically generated and sent by the <a href='http://boshrmapp:8080/jmts'>JMTS</a>. Please DO NOT reply.<br><br>";
-        message = message + "Signed<br>";
-        message = message + "Job Manager";
-
-        return message;
     }
 
     /**
@@ -1969,7 +1977,7 @@ public class JobManager implements
 
             currentJob = Job.copy(em, currentJob, getUser(), true, true);
             BusinessEntityActionUtils.addAction(BusinessEntity.Action.CREATE,
-                        currentJob.getActions());
+                    currentJob.getActions());
             getJobFinanceManager().setEnableOnlyPaymentEditing(false);
 
             PrimeFacesUtils.addMessage("Job Copied",
@@ -2316,50 +2324,6 @@ public class JobManager implements
 
     public Boolean isCurrentJobNew() {
         return (getCurrentJob().getId() == null);
-    }
-
-    public void generateEmailAlerts() {
-
-        EntityManager em = getEntityManager1();
-        // Post job mail to the department if this is a new job and wasn't entered by 
-        // by a person assignment 
-        try {
-            // Do not sent job email if user is a member of the department to which the job was assigned
-            if (isCurrentJobNew() && !getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(currentJob, em))) {
-                List<String> emails = Employee.getDepartmentSupervisorsEmailAddresses(Department.findDepartmentAssignedToJob(currentJob, em), em);
-                emails.add(Employee.findEmployeeDefaultEmailAdress(currentJob.getAssignedTo(), getEntityManager1()));
-                for (String email : emails) {
-                    if (!email.equals("")) {
-                        postJobManagerMail(null, email, "", "New Job Assignment", getNewJobEmailMessage(currentJob));
-                    } else {
-                        sendErrorEmail("The department's head email address is not valid!",
-                                "Job number: " + currentJob.getJobNumber()
-                                + "\nJMTS User: " + getUser().getUsername()
-                                + "\nDate/time: " + new Date());
-                    }
-                }
-
-            } else if (getIsDirty() && !getUser().isMemberOf(em, Department.findDepartmentAssignedToJob(currentJob, em))) {
-                List<String> emails = Employee.getDepartmentSupervisorsEmailAddresses(Department.findDepartmentAssignedToJob(currentJob, em), em);
-                emails.add(Employee.findEmployeeDefaultEmailAdress(currentJob.getAssignedTo(), getEntityManager1()));
-                for (String email : emails) {
-                    if (!email.equals("")) {
-                        postJobManagerMail(null, email, "", "Job Update Alert", getUpdatedJobEmailMessage(currentJob));
-                    } else {
-                        sendErrorEmail("The department's head email address is not valid!",
-                                "Job number: " + currentJob.getJobNumber()
-                                + "\nJMTS User: " + getUser().getUsername()
-                                + "\nDate/time: " + new Date());
-                    }
-                }
-
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error generating email alert");
-            System.out.println(e);
-        }
-
     }
 
     public void openClientsTab() {
