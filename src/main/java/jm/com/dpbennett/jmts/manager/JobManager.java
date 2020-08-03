@@ -176,14 +176,16 @@ public class JobManager implements
         for (BusinessEntity.Action action : getCurrentJob().getActions()) {
             switch (action) {
                 case CREATE:
-                    System.out.println("Processing create action...");
-                    emailJobAssignee();
+                    if (!Objects.equals(getCurrentJob().getAssignedTo().getId(),
+                            getCurrentJob().getJobStatusAndTracking().getEnteredBy().getId())) {
+                        emailJobAssignee();
+                    }
                     break;
                 case APPROVE:
-                    System.out.println("Processing approve action...");
+
                     break;
                 case PAYMENT:
-                    System.out.println("Processing payment action...");
+
                     break;
                 default:
                     System.out.println("No action");
