@@ -39,6 +39,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
+import jm.com.dpbennett.business.entity.BusinessEntity;
 import jm.com.dpbennett.business.entity.fm.CashPayment;
 import jm.com.dpbennett.business.entity.cm.Client;
 import jm.com.dpbennett.business.entity.fm.CostCode;
@@ -71,6 +72,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
 import jm.com.dpbennett.business.entity.sm.Alert;
+import jm.com.dpbennett.business.entity.util.BusinessEntityActionUtils;
 import jm.com.dpbennett.business.entity.util.BusinessEntityUtils;
 import jm.com.dpbennett.hrm.manager.HumanResourceManager;
 import jm.com.dpbennett.sm.util.BeanUtils;
@@ -3229,6 +3231,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
         if (getSelectedCashPayment().getId() == null) {
             getCurrentJob().getJobCostingAndPayment().getCashPayments().add(selectedCashPayment);
+            BusinessEntityActionUtils.addAction(BusinessEntity.Action.PAYMENT,
+                        getCurrentJob().getActions());
         }
 
         updateFinalCost();
@@ -3713,6 +3717,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                     = em.createQuery("SELECT c FROM CashPayment c "
                             + "WHERE c.jobId "
                             + "= '" + jobId + "'", CashPayment.class).getResultList();
+            
             return cashPayments;
         } catch (Exception e) {
             System.out.println(e);
@@ -3727,6 +3732,8 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         for (CashPayment payment : payments) {
             if (payment.equals(selectedCashPayment)) {
                 payments.remove(selectedCashPayment);
+                BusinessEntityActionUtils.removeAction(BusinessEntity.Action.PAYMENT,
+                        getCurrentJob().getActions());
                 break;
             }
         }

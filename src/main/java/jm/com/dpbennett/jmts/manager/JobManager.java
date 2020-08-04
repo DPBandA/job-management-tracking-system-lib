@@ -185,7 +185,7 @@ public class JobManager implements
 
                     break;
                 case PAYMENT:
-
+                    System.out.println("Processing payment received action...");
                     break;
                 default:
                     System.out.println("No action");
