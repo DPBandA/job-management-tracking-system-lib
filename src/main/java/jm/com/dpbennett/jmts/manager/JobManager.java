@@ -172,7 +172,7 @@ public class JobManager implements
                 "job assignee", "entered");
     }
 
-    private void processJobActions() {
+    public void processJobActions() {
         for (BusinessEntity.Action action : getCurrentJob().getActions()) {
             switch (action) {
                 case CREATE:

@@ -3116,6 +3116,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (getCurrentJob().getId() != null) {
             if (isJobCostingAndPaymentDirty()) {
                 if (getCurrentJob().prepareAndSave(getEntityManager1(), getUser()).isSuccess()) {
+                    
+                    getJobManager().processJobActions();
+                    
                     PrimeFacesUtils.addMessage("Payment and Job Saved", "Payment and the job and the payment were saved", FacesMessage.SEVERITY_INFO);
                 }
             }
