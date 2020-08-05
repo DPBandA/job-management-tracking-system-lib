@@ -212,6 +212,42 @@ public class JobManager implements
                 em);
     }
     
+    private void sendChildJobCostingApprovalEmail(
+            EntityManager em,
+            Employee sendTo,
+            String role,
+            String action) {
+
+        Email email = Email.findActiveEmailByName(em, "job-child-approval-email-template");
+
+        String jobNumber = getCurrentJob().getJobNumber();
+        String department = getCurrentJob().getDepartmentAssignedToJob().getName();
+        String APPURL = (String) SystemOption.getOptionValueObject(em, "appURL");
+        String assignee = getCurrentJob().getAssignedTo().getFirstName()
+                + " " + getCurrentJob().getAssignedTo().getLastName();
+        String approvalAmount = formatAsCurrency(getCurrentJob().getJobCostingAndPayment().getFinalCost(), "$");                
+        String dateOfApproval = BusinessEntityUtils.
+                getDateInMediumDateFormat(
+                        getCurrentJob().getJobStatusAndTracking().getDateCostingApproved());
+        
+        Utils.postMail(null, null,
+                sendTo,
+                email.getSubject().
+                        replace("{action}", action).
+                        replace("{jobNumber}", jobNumber),
+                email.getContent("/correspondences/").
+                        replace("{assignee}", assignee).
+                        replace("{action}", action).
+                        replace("{jobNumber}", jobNumber).
+                        replace("{APPURL}", APPURL).
+                        replace("{approvalAmount}", approvalAmount).
+                        replace("{department}", department).
+                        replace("{dateOfApproval}", dateOfApproval).
+                        replace("{role}", role),
+                email.getContentType(),
+                em);
+    }
+    
     public void processJobActions() {
         for (BusinessEntity.Action action : getCurrentJob().getActions()) {
             switch (action) {
@@ -225,7 +261,10 @@ public class JobManager implements
                     }
                     break;
                 case APPROVE:
-
+                    System.out.println("Processing child costing approval email..."); //tk
+                    sendChildJobCostingApprovalEmail(getEntityManager1(),
+                                getCurrentJob().getAssignedTo(),
+                                "job assignee", "entered");
                     break;
                 case PAYMENT:
                     System.out.println("Processing payment received action..."); //tk
@@ -234,7 +273,6 @@ public class JobManager implements
                                 "job assignee", "payment");
                     break;
                 default:
-                    System.out.println("No action");
                     break;
             }
         }
