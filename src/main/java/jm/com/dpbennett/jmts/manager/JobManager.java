@@ -72,6 +72,7 @@ import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
 import jm.com.dpbennett.business.entity.hrm.Email;
 import jm.com.dpbennett.business.entity.sm.Alert;
 import jm.com.dpbennett.business.entity.util.BusinessEntityActionUtils;
+import static jm.com.dpbennett.business.entity.util.NumberUtils.formatAsCurrency;
 import jm.com.dpbennett.business.entity.util.ReturnMessage;
 import jm.com.dpbennett.cm.manager.ClientManager;
 import jm.com.dpbennett.fm.manager.FinanceManager;
@@ -128,7 +129,7 @@ public class JobManager implements
         init();
     }
 
-    private void sendJobEmail(
+    private void sendJobEntryEmail(
             EntityManager em,
             Employee sendTo,
             String role,
@@ -165,27 +166,72 @@ public class JobManager implements
                 email.getContentType(),
                 em);
     }
+    
+    private void sendJobPaymentEmail(
+            EntityManager em,
+            Employee sendTo,
+            String role,
+            String action) {
 
-    private void emailJobAssignee() {
-        sendJobEmail(getEntityManager1(),
-                getCurrentJob().getAssignedTo(),
-                "job assignee", "entered");
+        Email email = Email.findActiveEmailByName(em, "job-payment-email-template");
+
+        String jobNumber = getCurrentJob().getJobNumber();
+        String department = getCurrentJob().getDepartmentAssignedToJob().getName();
+        String APPURL = (String) SystemOption.getOptionValueObject(em, "appURL");
+        String assignee = getCurrentJob().getAssignedTo().getFirstName()
+                + " " + getCurrentJob().getAssignedTo().getLastName();
+        String paymentAmount = "$0.00";
+        if (!getCurrentJob().getCashPayments().isEmpty()) {
+          // Get and use last payment  
+          paymentAmount = formatAsCurrency(getCurrentJob().getCashPayments().
+                  get(getCurrentJob().getCashPayments().size() - 1).getPayment(), "$");  
+        }        
+        String dateOfPayment = BusinessEntityUtils.
+                getDateInMediumDateFormat(
+                        getCurrentJob().getCashPayments().
+                  get(getCurrentJob().getCashPayments().size() - 1).getDateOfPayment());
+        String paymentPurpose = getCurrentJob().getCashPayments().
+                  get(getCurrentJob().getCashPayments().size() - 1).getPaymentPurpose();
+
+        Utils.postMail(null, null,
+                sendTo,
+                email.getSubject().
+                        replace("{action}", action).
+                        replace("{jobNumber}", jobNumber),
+                email.getContent("/correspondences/").
+                        replace("{assignee}", assignee).
+                        replace("{action}", action).
+                        replace("{jobNumber}", jobNumber).
+                        replace("{APPURL}", APPURL).
+                        replace("{paymentAmount}", paymentAmount).
+                        replace("{department}", department).
+                        replace("{dateOfPayment}", dateOfPayment).
+                        replace("{role}", role).
+                        replace("{paymentPurpose}", paymentPurpose),
+                email.getContentType(),
+                em);
     }
-
+    
     public void processJobActions() {
         for (BusinessEntity.Action action : getCurrentJob().getActions()) {
             switch (action) {
                 case CREATE:
                     if (!Objects.equals(getCurrentJob().getAssignedTo().getId(),
                             getCurrentJob().getJobStatusAndTracking().getEnteredBy().getId())) {
-                        emailJobAssignee();
+
+                        sendJobEntryEmail(getEntityManager1(),
+                                getCurrentJob().getAssignedTo(),
+                                "job assignee", "entered");
                     }
                     break;
                 case APPROVE:
 
                     break;
                 case PAYMENT:
-                    System.out.println("Processing payment received action...");
+                    System.out.println("Processing payment received action..."); //tk
+                    sendJobPaymentEmail(getEntityManager1(),
+                                getCurrentJob().getAssignedTo(),
+                                "job assignee", "payment");
                     break;
                 default:
                     System.out.println("No action");
