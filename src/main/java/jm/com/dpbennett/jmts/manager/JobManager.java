@@ -261,15 +261,15 @@ public class JobManager implements
                     }
                     break;
                 case APPROVE:
-                    System.out.println("Processing child costing approval email..."); //tk
                     if (getCurrentJob().getIsSubContract()) {
-                        sendChildJobCostingApprovalEmail(getEntityManager1(),
-                                getCurrentJob().getParent().getAssignedTo(), //tk
-                                "assignee", "approved");
+                        if (getCurrentJob().getParent() != null) {
+                            sendChildJobCostingApprovalEmail(getEntityManager1(),
+                                    getCurrentJob().getParent().getAssignedTo(),
+                                    "assignee", "approved");
+                        }
                     }
                     break;
                 case PAYMENT:
-                    System.out.println("Processing payment received action..."); //tk
                     sendJobPaymentEmail(getEntityManager1(),
                             getCurrentJob().getAssignedTo(),
                             "job assignee", "payment");
