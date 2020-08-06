@@ -166,7 +166,7 @@ public class JobManager implements
                 email.getContentType(),
                 em);
     }
-    
+
     private void sendJobPaymentEmail(
             EntityManager em,
             Employee sendTo,
@@ -182,16 +182,16 @@ public class JobManager implements
                 + " " + getCurrentJob().getAssignedTo().getLastName();
         String paymentAmount = "$0.00";
         if (!getCurrentJob().getCashPayments().isEmpty()) {
-          // Get and use last payment  
-          paymentAmount = formatAsCurrency(getCurrentJob().getCashPayments().
-                  get(getCurrentJob().getCashPayments().size() - 1).getPayment(), "$");  
-        }        
+            // Get and use last payment  
+            paymentAmount = formatAsCurrency(getCurrentJob().getCashPayments().
+                    get(getCurrentJob().getCashPayments().size() - 1).getPayment(), "$");
+        }
         String dateOfPayment = BusinessEntityUtils.
                 getDateInMediumDateFormat(
                         getCurrentJob().getCashPayments().
-                  get(getCurrentJob().getCashPayments().size() - 1).getDateOfPayment());
+                                get(getCurrentJob().getCashPayments().size() - 1).getDateOfPayment());
         String paymentPurpose = getCurrentJob().getCashPayments().
-                  get(getCurrentJob().getCashPayments().size() - 1).getPaymentPurpose();
+                get(getCurrentJob().getCashPayments().size() - 1).getPaymentPurpose();
 
         Utils.postMail(null, null,
                 sendTo,
@@ -211,7 +211,7 @@ public class JobManager implements
                 email.getContentType(),
                 em);
     }
-    
+
     private void sendChildJobCostingApprovalEmail(
             EntityManager em,
             Employee sendTo,
@@ -225,11 +225,11 @@ public class JobManager implements
         String APPURL = (String) SystemOption.getOptionValueObject(em, "appURL");
         String assignee = getCurrentJob().getAssignedTo().getFirstName()
                 + " " + getCurrentJob().getAssignedTo().getLastName();
-        String approvalAmount = formatAsCurrency(getCurrentJob().getJobCostingAndPayment().getFinalCost(), "$");                
+        String approvalAmount = formatAsCurrency(getCurrentJob().getJobCostingAndPayment().getFinalCost(), "$");
         String dateOfApproval = BusinessEntityUtils.
                 getDateInMediumDateFormat(
                         getCurrentJob().getJobStatusAndTracking().getDateCostingApproved());
-        
+
         Utils.postMail(null, null,
                 sendTo,
                 email.getSubject().
@@ -247,7 +247,7 @@ public class JobManager implements
                 email.getContentType(),
                 em);
     }
-    
+
     public void processJobActions() {
         for (BusinessEntity.Action action : getCurrentJob().getActions()) {
             switch (action) {
@@ -262,15 +262,17 @@ public class JobManager implements
                     break;
                 case APPROVE:
                     System.out.println("Processing child costing approval email..."); //tk
-                    sendChildJobCostingApprovalEmail(getEntityManager1(),
-                                getCurrentJob().getAssignedTo(),
-                                "job assignee", "entered");
+                    if (getCurrentJob().getIsSubContract()) {
+                        sendChildJobCostingApprovalEmail(getEntityManager1(),
+                                getCurrentJob().getParent().getAssignedTo(), //tk
+                                "assignee", "approved");
+                    }
                     break;
                 case PAYMENT:
                     System.out.println("Processing payment received action..."); //tk
                     sendJobPaymentEmail(getEntityManager1(),
-                                getCurrentJob().getAssignedTo(),
-                                "job assignee", "payment");
+                            getCurrentJob().getAssignedTo(),
+                            "job assignee", "payment");
                     break;
                 default:
                     break;
