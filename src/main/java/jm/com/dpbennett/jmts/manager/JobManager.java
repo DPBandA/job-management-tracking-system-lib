@@ -79,7 +79,6 @@ import jm.com.dpbennett.fm.manager.FinanceManager;
 import jm.com.dpbennett.hrm.manager.HumanResourceManager;
 import jm.com.dpbennett.jmts.JMTSApplication;
 import jm.com.dpbennett.lo.manager.LegalDocumentManager;
-import jm.com.dpbennett.pm.manager.PurchasingManager;
 import jm.com.dpbennett.rm.manager.ReportManager;
 import jm.com.dpbennett.sc.manager.ComplianceManager;
 import jm.com.dpbennett.sm.Authentication.AuthenticationListener;
@@ -719,10 +718,6 @@ public class JobManager implements
         return BeanUtils.findBean("jobFinanceManager");
     }
 
-    public PurchasingManager getPurchasingManager() {
-        return BeanUtils.findBean("purchasingManager");
-    }
-
     public ComplianceManager getComplianceManager() {
         return BeanUtils.findBean("complianceManager");
     }
@@ -798,7 +793,6 @@ public class JobManager implements
         return searchTypes;
     }
 
-    // tk check if this needs to be in this class
     public ArrayList getDateSearchFields() {
         ArrayList dateSearchFields = new ArrayList();
 
@@ -880,7 +874,6 @@ public class JobManager implements
             getJobContractManager();
             getJobFinanceManager();
             getFinanceManager();
-            getPurchasingManager();
             getJobSampleManager();
             getReportManager();
             getHumanResourceManager();
@@ -1905,9 +1898,6 @@ public class JobManager implements
         switch (getDashboard().getSelectedTabId()) {
             case "Survey Browser":
                 getComplianceManager().doSurveySearch();
-                break;
-            case "Procurement":
-                getPurchasingManager().doSearch();
                 break;
             case "Financial Administration":
                 getFinanceManager().doSearch();
