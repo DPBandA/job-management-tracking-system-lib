@@ -1,6 +1,6 @@
 /*
 Job Management & Tracking System (JMTS) 
-Copyright (C) 2017  D P Bennett & Associates Limited
+Copyright (C) 2020  D P Bennett & Associates Limited
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -2146,6 +2146,11 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         return true;
     }
 
+    public Boolean getDisableInvoiceJobCosting() {
+        return !getUser().getEmployee().getDepartment().getPrivilege().getCanEditInvoicingAndPayment()
+                || !getCurrentJob().getJobCostingAndPayment().getCostingApproved();
+    }
+
     /**
      * Determines if a job costing can be invoiced. A PrimeFaces message is
      * displayed if the job costing cannot be invoiced.
@@ -2467,7 +2472,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             } else {
 
                 setJobCostingAndPaymentDirty(true);
-               
+
             }
         } else {
             setJobCostingAndPaymentDirty(true);
@@ -2555,7 +2560,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                         getUser().getEmployee());
                 BusinessEntityActionUtils.addAction(BusinessEntity.Action.APPROVE,
                         getCurrentJob().getActions());
-                
+
             } else {
                 getCurrentJob().getJobStatusAndTracking().setDateCostingApproved(null);
                 getCurrentJob().getJobCostingAndPayment().setCostingApprovedBy(null);
@@ -3092,9 +3097,9 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (getCurrentJob().getId() != null) {
             if (isJobCostingAndPaymentDirty()) {
                 if (getCurrentJob().prepareAndSave(getEntityManager1(), getUser()).isSuccess()) {
-                    
+
                     getJobManager().processJobActions();
-                    
+
                     PrimeFacesUtils.addMessage("Payment and Job Saved", "Payment and the job and the payment were saved", FacesMessage.SEVERITY_INFO);
                 }
             }
@@ -3212,7 +3217,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
         if (getSelectedCashPayment().getId() == null) {
             getCurrentJob().getJobCostingAndPayment().getCashPayments().add(selectedCashPayment);
             BusinessEntityActionUtils.addAction(BusinessEntity.Action.PAYMENT,
-                        getCurrentJob().getActions());
+                    getCurrentJob().getActions());
         }
 
         updateFinalCost();
@@ -3697,7 +3702,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
                     = em.createQuery("SELECT c FROM CashPayment c "
                             + "WHERE c.jobId "
                             + "= '" + jobId + "'", CashPayment.class).getResultList();
-            
+
             return cashPayments;
         } catch (Exception e) {
             System.out.println(e);
