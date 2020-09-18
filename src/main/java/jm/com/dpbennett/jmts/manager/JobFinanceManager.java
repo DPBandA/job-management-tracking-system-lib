@@ -2628,6 +2628,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
             return false;
         }
 
+        /*
         if (areThereSubcontractCostingsToInclude(job)
                 && (job.getJobCostingAndPayment().getCostingApproved() || approve)) {
             PrimeFacesUtils.addMessage("Cannot Approve Job Costing",
@@ -2637,6 +2638,7 @@ public class JobFinanceManager implements Serializable, BusinessEntityManagement
 
             return false;
         }
+        */
 
         if (!job.getJobCostingAndPayment().getCostingCompleted()
                 || job.getJobCostingAndPayment().getInvoiced()) {
