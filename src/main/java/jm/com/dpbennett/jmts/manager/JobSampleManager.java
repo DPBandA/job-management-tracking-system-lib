@@ -37,6 +37,7 @@ import jm.com.dpbennett.business.entity.sm.SystemOption;
 import jm.com.dpbennett.business.entity.jmts.Job;
 import jm.com.dpbennett.business.entity.gm.BusinessEntityManagement;
 import jm.com.dpbennett.business.entity.util.BusinessEntityUtils;
+import jm.com.dpbennett.jmts.JobSampleDataModel;
 import jm.com.dpbennett.sm.util.BeanUtils;
 import jm.com.dpbennett.sm.util.PrimeFacesUtils;
 import org.primefaces.PrimeFaces;
@@ -191,10 +192,10 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
      * @param event
      */
     public void updateSampleQuantity(AjaxBehaviorEvent event) {
-        if (hasFieldValueChange(event.getComponent().getId())) {
-            getSelectedJobSample().setIsDirty(true);
-            updateSampleReference();
-        }
+        //if (hasFieldValueChange(event.getComponent().getId())) {
+        getSelectedJobSample().setIsDirty(true);
+        updateSampleReference();
+        //}
     }
 
     private void updateSampleReference() {
@@ -225,12 +226,12 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
 
     public void updateSample(AjaxBehaviorEvent event) {
         if (event.getComponent() != null) {
-            if (hasFieldValueChange(event.getComponent().getId())) {
-                getSelectedJobSample().setIsDirty(true);
-            }
+            //if (hasFieldValueChange(event.getComponent().getId())) {
+            getSelectedJobSample().setIsDirty(true);
+            //}
         }
-    }    
-   
+    }
+
     public void okJobSample() {
         EntityManager em = getEntityManager1();
         updateSampleReference();
@@ -305,27 +306,13 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
         PrimeFaces.current().dialog().closeDynamic(null);
     }
 
+    public JobSampleDataModel getSamplesModel() {
+        return new JobSampleDataModel(getCurrentJob().getFilteredJobSamples());
+    }
+
     public void editJobSample(ActionEvent event) {
         jobSampleDialogTabViewActiveIndex = 0;
         PrimeFacesUtils.openDialog(null, "/job/sample/jobSampleDialog", true, true, true, 600, 700);
-    }
-
-    public void setEditSelectedJobSample(JobSample selectedJobSample) {
-
-        // Get the saved sample for edit if it exists
-        if (selectedJobSample.getId() != null) {
-            EntityManager em = getEntityManager1();
-            this.selectedJobSample = JobSample.findJobSampleById(em, selectedJobSample.getId());
-            em.refresh(this.selectedJobSample);
-            getCurrentJob().getJobSamples().remove(selectedJobSample);
-            getCurrentJob().getJobSamples().add(this.selectedJobSample);
-        } else {
-            this.selectedJobSample = selectedJobSample;
-        }
-
-        selectedJobSampleBackup = new JobSample(this.selectedJobSample);
-        this.selectedJobSample.setIsToBeAdded(false);
-        this.selectedJobSample.setIsDirty(false);
     }
 
     public void openJobSampleDeleteConfirmDialog(ActionEvent event) {
@@ -452,87 +439,87 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
         return EMF1.createEntityManager();
     }
 
-    private Boolean hasFieldValueChange(String componentId) {
-        switch (componentId) {
-            case "sampleReference":
-                if (!selectedJobSample.getReference().equals(selectedJobSampleBackup.getReference())) {
-                    return true;
-                }
-                break;
-            case "sampledBy":
-                if (!selectedJobSample.getSampledBy().equals(selectedJobSampleBackup.getSampledBy())) {
-                    return true;
-                }
-                break;
-            case "dateSampled":
-                if (!selectedJobSample.getDateSampled().equals(selectedJobSampleBackup.getDateSampled())) {
-                    return true;
-                }
-                break;
-            case "sampleQuantity":
-                if (!selectedJobSample.getSampleQuantity().equals(selectedJobSampleBackup.getSampleQuantity())) {
-                    return true;
-                }
-                break;
-            case "productCommonName":
-                if (!selectedJobSample.getName().equals(selectedJobSampleBackup.getName())) {
-                    return true;
-                }
-                break;
-            case "sampleCountryOfOrigin":
-                if (!selectedJobSample.getCountryOfOrigin().equals(selectedJobSampleBackup.getCountryOfOrigin())) {
-                    return true;
-                }
-                break;
-            case "productBrand":
-                if (!selectedJobSample.getProductBrand().equals(selectedJobSampleBackup.getProductBrand())) {
-                    return true;
-                }
-                break;
-            case "productModel":
-                if (!selectedJobSample.getProductModel().equals(selectedJobSampleBackup.getProductModel())) {
-                    return true;
-                }
-                break;
-            case "productSerialNumber":
-                if (!selectedJobSample.getProductSerialNumber().equals(selectedJobSampleBackup.getProductSerialNumber())) {
-                    return true;
-                }
-                break;
-            case "productCode":
-                if (!selectedJobSample.getProductCode().equals(selectedJobSampleBackup.getProductCode())) {
-                    return true;
-                }
-                break;
-            case "sampleDescription":
-                if (!selectedJobSample.getDescription().equals(selectedJobSampleBackup.getDescription())) {
-                    return true;
-                }
-                break;
-            case "productQuantity":
-                if (!selectedJobSample.getQuantity().equals(selectedJobSampleBackup.getQuantity())) {
-                    return true;
-                }
-                break;
-            case "productUnitOfMeasure":
-                if (!selectedJobSample.getUnitOfMeasure().equals(selectedJobSampleBackup.getUnitOfMeasure())) {
-                    return true;
-                }
-                break;
-            case "methodOfDisposal":
-                if (!selectedJobSample.getMethodOfDisposal().equals(selectedJobSampleBackup.getMethodOfDisposal())) {
-                    return true;
-                }
-                break;
-            case "dateSampleReceived":
-                if (!selectedJobSample.getDateReceived().equals(selectedJobSampleBackup.getDateReceived())) {
-                    return true;
-                }
-                break;
-            default:
-                break;
-        }
-
-        return false;
-    }
+//    private Boolean hasFieldValueChange(String componentId) {
+//        switch (componentId) {
+//            case "sampleReference":
+//                if (!selectedJobSample.getReference().equals(selectedJobSampleBackup.getReference())) {
+//                    return true;
+//                }
+//                break;
+//            case "sampledBy":
+//                if (!selectedJobSample.getSampledBy().equals(selectedJobSampleBackup.getSampledBy())) {
+//                    return true;
+//                }
+//                break;
+//            case "dateSampled":
+//                if (!selectedJobSample.getDateSampled().equals(selectedJobSampleBackup.getDateSampled())) {
+//                    return true;
+//                }
+//                break;
+//            case "sampleQuantity":
+//                if (!selectedJobSample.getSampleQuantity().equals(selectedJobSampleBackup.getSampleQuantity())) {
+//                    return true;
+//                }
+//                break;
+//            case "productCommonName":
+//                if (!selectedJobSample.getName().equals(selectedJobSampleBackup.getName())) {
+//                    return true;
+//                }
+//                break;
+//            case "sampleCountryOfOrigin":
+//                if (!selectedJobSample.getCountryOfOrigin().equals(selectedJobSampleBackup.getCountryOfOrigin())) {
+//                    return true;
+//                }
+//                break;
+//            case "productBrand":
+//                if (!selectedJobSample.getProductBrand().equals(selectedJobSampleBackup.getProductBrand())) {
+//                    return true;
+//                }
+//                break;
+//            case "productModel":
+//                if (!selectedJobSample.getProductModel().equals(selectedJobSampleBackup.getProductModel())) {
+//                    return true;
+//                }
+//                break;
+//            case "productSerialNumber":
+//                if (!selectedJobSample.getProductSerialNumber().equals(selectedJobSampleBackup.getProductSerialNumber())) {
+//                    return true;
+//                }
+//                break;
+//            case "productCode":
+//                if (!selectedJobSample.getProductCode().equals(selectedJobSampleBackup.getProductCode())) {
+//                    return true;
+//                }
+//                break;
+//            case "sampleDescription":
+//                if (!selectedJobSample.getDescription().equals(selectedJobSampleBackup.getDescription())) {
+//                    return true;
+//                }
+//                break;
+//            case "productQuantity":
+//                if (!selectedJobSample.getQuantity().equals(selectedJobSampleBackup.getQuantity())) {
+//                    return true;
+//                }
+//                break;
+//            case "productUnitOfMeasure":
+//                if (!selectedJobSample.getUnitOfMeasure().equals(selectedJobSampleBackup.getUnitOfMeasure())) {
+//                    return true;
+//                }
+//                break;
+//            case "methodOfDisposal":
+//                if (!selectedJobSample.getMethodOfDisposal().equals(selectedJobSampleBackup.getMethodOfDisposal())) {
+//                    return true;
+//                }
+//                break;
+//            case "dateSampleReceived":
+//                if (!selectedJobSample.getDateReceived().equals(selectedJobSampleBackup.getDateReceived())) {
+//                    return true;
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//
+//        return false;
+//    }
 }
