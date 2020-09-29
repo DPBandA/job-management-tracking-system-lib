@@ -51,7 +51,6 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
     @PersistenceUnit(unitName = "JMTSPU")
     private EntityManagerFactory EMF1;
     private JobSample selectedJobSample;
-    private JobSample selectedJobSampleBackup;
     private Integer jobSampleDialogTabViewActiveIndex;
     private JobManager jobManager;
 
@@ -65,7 +64,6 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
     private void init() {
         selectedJobSample = new JobSample();
         jobSampleDialogTabViewActiveIndex = 0;
-        selectedJobSampleBackup = null;
     }
 
     /*
@@ -138,7 +136,6 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
         }
 
         selectedJobSample.setDateSampled(new Date());
-        selectedJobSampleBackup = new JobSample(this.selectedJobSample);
         jobSampleDialogTabViewActiveIndex = 0;
 
         if (event != null) {
@@ -344,7 +341,6 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
     public void setCopySelectedJobSample(JobSample selectedJobSample) {
         this.selectedJobSample = selectedJobSample;
         if (selectedJobSample != null) {
-            selectedJobSampleBackup = new JobSample(this.selectedJobSample);
             doCopyJobSample();
             this.selectedJobSample.setIsToBeAdded(true);
             this.selectedJobSample.setIsDirty(true);
@@ -352,9 +348,7 @@ public class JobSampleManager implements Serializable, BusinessEntityManagement 
     }
 
     public void cancelJobSampleDialogEdits() {
-        // Restore backed up job sample        
-        selectedJobSample.copy(selectedJobSampleBackup);
-
+        
         PrimeFaces.current().dialog().closeDynamic(null);
     }
 

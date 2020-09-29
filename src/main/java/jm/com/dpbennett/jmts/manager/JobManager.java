@@ -2058,7 +2058,7 @@ public class JobManager implements
                     FacesMessage.SEVERITY_ERROR);
         } else {
 
-            currentJob = Job.copy(em, currentJob, getUser(), true, true);
+            currentJob = Job.copy(em, currentJob, getUser(), true, false);
             BusinessEntityActionUtils.addAction(BusinessEntity.Action.CREATE,
                     currentJob.getActions());
             getJobFinanceManager().setEnableOnlyPaymentEditing(false);
