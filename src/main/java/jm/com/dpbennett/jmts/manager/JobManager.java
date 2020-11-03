@@ -1418,7 +1418,7 @@ public class JobManager implements
                 // Create copy of job and use current sequence number and year.                
                 Long currentJobSequenceNumber = parent.getJobSequenceNumber();
                 Integer yearReceived = parent.getYearReceived();
-                currentJob = Job.copy(em, parent, getUser(), true, true);
+                currentJob = Job.copy(em, parent, getUser(), true, false);
                 currentJob.setParent(parent);
                 currentJob.setClassification(new Classification());
                 currentJob.setClient(new Client());
